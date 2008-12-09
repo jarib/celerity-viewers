@@ -1,0 +1,81 @@
+require 'osx/cocoa' # dummy
+require 'rubygems'
+require 'rake'
+require 'rake/clean'
+require 'rake/testtask'
+require 'erb'
+require 'pathname'
+
+APPNAME     = ICON = "CelerityViewer"
+TARGET      = "#{APPNAME}.app"
+APP_VERSION = `git rev-parse HEAD`[0,7].chomp
+RESOURCES   = ['*.rb', '*.lproj', 'Credits.*', '*.icns']
+PKGINC      = [TARGET, 'README.markdown']
+COPYRIGHT   = "Copyright © 2008 FINN.no AS"
+BUNDLEID    = "com.celerity.#{APPNAME.downcase}"
+#PUBLISH   = 'yourname@yourhost:path'
+
+CLEAN.include ['**/.*.sw?', '*.dmg', TARGET, 'image', 'a.out', APPNAME, 'pkg']
+
+# Tasks
+task :default => [:test]
+
+desc 'Create Application Budle and Run it.'
+task :test => [TARGET] do
+	sh "open '#{TARGET}'"
+end
+
+desc 'Create .dmg file for Publish'
+task :package => [:clean, 'pkg', TARGET] do
+	name = "#{APPNAME}#{APP_VERSION}"
+	mkdir "image", :verbose => true
+	PKGINC.each do |item|
+	  cp_r item, "image", :verbose => true
+  end
+  
+	puts 'Creating Image...'
+	sh %{hdiutil create -volname #{name} -srcfolder image #{name}.dmg}
+	
+	rm_rf "image", :verbose => true
+	mv "#{name}.dmg", "pkg"
+end
+
+desc 'Publish .dmg file to specific server.'
+task :publish => [:package] do
+	sh %{git log > CHANGES}
+	_, host, path = *PUBLISH.match(/^([^\s]+):(.+)$/)
+	path = Pathname.new path
+	puts "Publish: Host: #{host}, Path: #{path}"
+	
+	sh %Q{
+  	scp pkg/IIrcv.#{APP_VERSION}.dmg #{PUBLISH}/pkg
+  	scp CHANGES #{PUBLISH}/pkg
+	}
+end
+
+desc 'Make executable Application Bundle'
+file TARGET => [:clean, APPNAME] do
+  sh %{
+    mkdir -p "#{APPNAME}.app/Contents/MacOS"
+    mkdir    "#{APPNAME}.app/Contents/Resources"
+    cp -rp #{RESOURCES.join(' ')} "#{APPNAME}.app/Contents/Resources"
+    cp '#{APPNAME}' "#{APPNAME}.app/Contents/MacOS"
+    echo -n "APPL????" > "#{APPNAME}.app/Contents/PkgInfo"
+    echo -n #{VERSION} > "#{APPNAME}.app/Contents/Resources/VERSION"
+  }
+  File.open("#{APPNAME}.app/Contents/Info.plist", "w") do |f|
+    f.puts ERB.new(File.read("Info.plist.erb")).result
+  end
+end
+
+file APPNAME => ['main.m'] do
+	sh %{gcc -arch ppc -arch i386 -Wall -lobjc -framework RubyCocoa main.m -o '#{APPNAME}'}
+end
+
+desc 'Install the application bundle in /Applications'
+task :install => [TARGET] do
+  cp_r "#{APPNAME}.app", "/Applications", :verbose => true
+end
+
+directory 'pkg'
+

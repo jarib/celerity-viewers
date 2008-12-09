@@ -1,0 +1,190 @@
+class JarCreator
+  include FileUtils
+
+  def initialize(opts = {})
+    @opts = opts
+    @verbose = opts[:verbose]
+    @cwd = Dir.pwd
+    @pkg_dir = "pkg"
+    @target_dir = "classes"
+    @ruby_files = Dir['**/*.rb']
+  end
+
+  def build
+    create_dirs
+    compile_ruby
+    extract_jar_files
+    build_jar
+  end
+
+  private
+
+  def create_dirs
+    rm_rf   @target_dir, :verbose => @verbose
+    mkdir_p @target_dir, :verbose => @verbose
+    mkdir_p @pkg_dir, :verbose => @verbose
+  end
+
+  def extract_jar_files
+    jar_files.each do |f|
+      cp f, @target_dir, :verbose => @verbose
+    end
+
+    chdir @target_dir, :verbose => @verbose
+    jar_files.each do |file|
+      extract_jar(file)
+      rm_f file, :verbose => @verbose
+    end
+
+    chdir @cwd, :verbose => @verbose
+  end
+
+  # def create_manifest
+  #   File.open(@manifest, "w") { |f| f << "Main-Class: Main\n" }
+  # end
+
+  def build_jar
+#    sh jar, "cvmf", @manifest, file_name, '-C', @target_dir, '.'
+    sh jar, "cvf", file_name, '-C', @target_dir, '.'
+  end
+
+  def compile_ruby
+    sh "jruby -S jrubyc -t #{@target_dir} #{@ruby_files.join(' ')}"
+  end
+
+  # def compile_java
+  #   sh javac, "-cp", "#{jruby_home}/lib/jruby.jar", "Main.java"
+  #   mv "Main.class", @target_dir, :verbose => @verbose
+  # end
+
+  def jar_files
+    raise NotImplementedError
+  end
+
+  def file_name
+    raise NotImplementedError
+  end
+
+  def extract_jar(file)
+    sh jar, "xf", file
+  end
+
+  def jar
+    'jar'
+  end
+
+  def javac
+    'javac'
+  end
+
+  def jruby_home
+    ENV['JRUBY_HOME'] or raise "*** must set JRUBY_HOME env var"
+  end
+
+end
+
+class WinJarCreator < JarCreator
+  def initialize(*args)
+    super
+    raise "*** must set JAVA_HOME env var" unless ENV['JAVA_HOME']
+    @java_dir = ENV['JAVA_HOME'] + "/bin"
+  end
+
+  def jar
+    file = "#{@java_dir}/jar.exe"
+    File.exist?(file) ? file : super
+  end
+
+  def javac
+    file = "#{@java_dir}/javac.exe"
+    File.exist?(file) ? file : super
+  end
+
+  def jar_files
+    ['swt-win.jar']
+  end
+
+  def file_name
+    "#{@pkg_dir}/celerity-swt-win.jar"
+  end
+end
+
+class MacJarCreator < JarCreator
+  def file_name
+    "#{@pkg_dir}/celerity-swt-mac.jar"
+  end
+
+  def jar_files
+    ['swt-carbon.jar']
+  end
+
+  def build_jar
+    super
+    puts "\n ::: PS. You really want CelerityViewer.app (RubyCocoa) instead :::\n"
+  end
+end
+
+class LinuxJarCreator < JarCreator
+  def file_name
+    "#{@pkg_dir}/celerity-swt-linux.jar"
+  end
+
+  def jar_files
+    ['swt-linux.jar']
+  end
+end
+
+namespace :jar do
+
+  desc 'Compile and create celerity-swt-win.jar'
+  task :win do
+    WinJarCreator.new(:verbose => true).build
+  end
+
+  desc 'Compile and create celerity-swt-mac.jar'
+  task :mac do
+    MacJarCreator.new(:verbose => true).build
+  end
+
+  desc 'Compile and create celerity-swt-linux.jar'
+  task :linux do
+    LinuxJarCreator.new(:verbose => true).build
+  end
+
+  task :guess do
+    if RUBY_PLATFORM =~ /java/
+      os_name = java.lang.System.getProperty("os.name")
+    else
+      os_name = RUBY_PLATFORM
+    end
+
+    task = case os_name
+           when /darwin|Mac OS X/i
+             'jar:mac'
+           when /linux/i
+             'jar:linux'
+           when /win32|mingw|windows/i
+             'jar:win'
+           else
+             raise "unknown os name: #{os_name.inspect}"
+           end
+    puts "Building jar for #{os_name}"
+
+    Rake::Task[task].invoke
+  end
+
+end
+
+desc 'Compile and create jar file (guessing OS)'
+task :jar => %w[jar:guess]
+
+task :fix_glimmer do
+  Dir['glimmer/**/*.rb'].each do |file|
+    p file
+    data = File.read(file)
+    data.gsub!("File.dirname(__FILE__)", File.dirname(file).inspect)
+    data.gsub!('require "glimmer/src/command_handlers" + "/../command_handler"', 'require "glimmer/src/command_handler"')
+    File.open(file, "w") { |f| f << data}
+  end
+end
+
