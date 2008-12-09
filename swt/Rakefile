@@ -1,3 +1,5 @@
+require "rake/clean"
+
 class JarCreator
   include FileUtils
 
@@ -188,3 +190,4 @@ task :fix_glimmer do
   end
 end
 
+CLEAN.include %w[pkg classes]
