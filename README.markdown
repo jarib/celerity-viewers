@@ -7,11 +7,11 @@ how
 ===
 
 The applications set up a DRb server (with ACL) on port 6429. Celerity will look
-for a «viewer» on this port whenever an instance of the browser is created, and if
-found, calls `render_html(html_string, current_url)` on the DRb object for 
-every page load.
+for anyone listening on this port whenever an instance of the browser is created, and, if
+found, call `render_html(html_string, current_url)` on the DRb object for every page loaded.
 
-The RubyCocoa version has the WebKit inspector enabled - right-click, then «Inspect Element».
-The SWT version includes the MouseOver DOM inspector.
+The RubyCocoa version has the WebKit inspector enabled - right-click and _Inspect Element_.
+The SWT version includes the [MouseOver DOM inspector][modi].
 
 [cel]: http://celerity.rubyforge.org "Celerity Home Page"
+[modi]: http://slayeroffice.com/tools/modi/v2.0/modi_help.html
