@@ -16,7 +16,7 @@ notes
 
 * On OS X, you need to use Java 5/32-bit and add -J-XstartOnFirstThread to the 
 JRuby arguments (or look at the RubyCocoa version instead).
-* By setting the environment variable SWT_MOZILLA, the app will try to use 
+* By setting the environment variable SWT\_MOZILLA, the app will try to use 
   Mozilla/XULRunner as the rendering engine. See [this page][swtmoz] for how to 
   make it work. 
   
