@@ -79,6 +79,10 @@ class CelerityViewer
   rescue
     puts $!, $@
   end
+  
+  def save(path = nil)
+    # does nothing
+  end
 
   def show_inspector
     @browser.widget.execute(INSPECTORS[@inspector])

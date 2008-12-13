@@ -58,7 +58,7 @@ file TARGET => [:clean, APPNAME] do
   sh %{
     mkdir -p "#{APPNAME}.app/Contents/MacOS"
     mkdir    "#{APPNAME}.app/Contents/Resources"
-    cp -rp #{RESOURCES.join(' ')} "#{APPNAME}.app/Contents/Resources"
+    cp -pr #{RESOURCES.join(' ')} "#{APPNAME}.app/Contents/Resources"
     cp '#{APPNAME}' "#{APPNAME}.app/Contents/MacOS"
     echo -n "APPL????" > "#{APPNAME}.app/Contents/PkgInfo"
     echo -n #{VERSION} > "#{APPNAME}.app/Contents/Resources/VERSION"

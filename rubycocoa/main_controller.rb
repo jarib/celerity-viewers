@@ -11,13 +11,32 @@ class MainController < NSObject
   def awakeFromNib
     @window.delegate = self # for windowWillClose
     setup_webview
-    setup_counter
+    setup_counters
     setup_panel
     load_url
     start_drb
   rescue
     log $!
     raise $!
+  end
+  
+  def setup_panel
+    @window.floatingPanel = false
+  end
+  
+  def setup_webview
+    NSUserDefaults.standardUserDefaults.setObject_forKey('YES', 'WebKitDeveloperExtras')
+    @web_view.preferences.setShouldPrintBackgrounds(true)
+  end
+  
+  def setup_counters
+    @save_count = 0
+    @update_count = 0
+    @status_label.stringValue = "Updated: #{@update_count} times."
+  end
+  
+  def start_drb
+    DRb.start_service("druby://127.0.0.1:6429", self)
   end
 
   def load_url(sender = @text_field)
@@ -54,7 +73,9 @@ class MainController < NSObject
     log(e)
   end
 
-  def print(path = nil)
+  def save(path = nil)
+    @save_count += 1
+    
     if path
       viewport = @web_view.mainFrame.frameView.documentView
       viewport_bounds = viewport.bounds
@@ -68,24 +89,6 @@ class MainController < NSObject
   
   def windowWillClose(sender)
     NSApplication.sharedApplication.terminate(0)
-  end
-
-  def setup_panel
-    @window.floatingPanel = false
-  end
-  
-  def setup_webview
-    NSUserDefaults.standardUserDefaults.setObject_forKey('YES', 'WebKitDeveloperExtras')
-    @web_view.preferences.setShouldPrintBackgrounds(true)
-  end
-  
-  def setup_counter
-    @update_count = 0
-    @status_label.stringValue = "Updated: #{@update_count} times."
-  end
-  
-  def start_drb
-    DRb.start_service("druby://127.0.0.1:6429", self)
   end
 end
 
