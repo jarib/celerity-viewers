@@ -1,6 +1,7 @@
 require "drb"
 require "drb/acl"
 require "uri"
+require "fileutils"
 
 DRb.install_acl(ACL.new(%w[deny all allow 127.0.0.1]))
 
@@ -27,6 +28,7 @@ class MainController < NSObject
   def setup_webview
     NSUserDefaults.standardUserDefaults.setObject_forKey('YES', 'WebKitDeveloperExtras')
     @web_view.preferences.setShouldPrintBackgrounds(true)
+    @web_view.frameLoadDelegate = self
   end
   
   def setup_counters
@@ -64,7 +66,7 @@ class MainController < NSObject
     if url
       uri = URI.parse(url)
       base_url = "#{uri.scheme}://#{uri.host}"
-      @text_field.setStringValue(url)
+      @text_field.stringValue = url
       url = NSURL.URLWithString(base_url)
     end
     @web_view.mainFrame.loadHTMLString_baseURL(html, url)
@@ -75,20 +77,43 @@ class MainController < NSObject
 
   def save(path = nil)
     @save_count += 1
+    return @web_view.print(nil) unless path
     
-    if path
-      viewport = @web_view.mainFrame.frameView.documentView
-      viewport_bounds = viewport.bounds
-      image_rep = viewport.bitmapImageRepForCachingDisplayInRect(viewport_bounds)
-      viewport.cacheDisplayInRect_toBitmapImageRep(viewport_bounds, image_rep)
-      image_rep.representationUsingType_properties(NSPNGFileType, nil).writeToFile_atomically(path, true)
-    else
-      @web_view.print(nil)
-    end
+    viewport        = @web_view.mainFrame.frameView.documentView
+    viewport_bounds = viewport.bounds
+    image_rep       = viewport.bitmapImageRepForCachingDisplayInRect(viewport_bounds)
+    FileUtils.mkdir_p File.dirname(path)
+    
+    viewport.cacheDisplayInRect_toBitmapImageRep(viewport_bounds, image_rep)
+    
+    return unless image_rep
+    
+    image_rep.representationUsingType_properties(NSPNGFileType, nil).writeToFile_atomically(path, true)
+    log("Wrote screenshot to #{path}")
+    
+    @save_count
+  rescue => e
+    log($!, $@)
+    raise e
   end
+
+  #
+  # delegate methods
+  #
   
   def windowWillClose(sender)
     NSApplication.sharedApplication.terminate(0)
   end
+  
+  def webView_didStartProvisionalLoadForFrame(view, frame)
+    @text_field.stringValue = view.mainFrameURL
+  end
+
+  # for debugging
+  # def respond_to?(*args)
+  #   retval = super
+  #   p :respond_to => args, :retval => retval
+  #   retval
+  # end
 end
 
