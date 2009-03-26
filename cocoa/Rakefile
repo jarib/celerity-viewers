@@ -1,0 +1,26 @@
+require "rubygems"
+require "rake"
+require "rake/clean"
+
+EXECUTABLE = "build/Release/CelerityViewer.app"
+
+CLEAN << 'build'
+
+desc 'Build CelerityViewer.app'
+task :build do
+  sh "xcodebuild"
+end
+
+desc "Run #{EXECUTABLE}"
+task :run do
+  sh "open #{EXECUTABLE}"
+end
+
+desc 'Install CelerityViewer.app to /Applications'
+task :install => %w[build] do
+  mv EXECUTABLE, "/Applications", :verbose => true
+end
+
+desc 'Build and run'
+task :default => %w[build run]
+
