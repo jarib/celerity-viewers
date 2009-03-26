@@ -17,5 +17,5 @@
 -(void)handleConnection:(NSNotification *)notification;
 -(void)updateWithData:(NSData*)data;
 -(void)alert:(NSString*)message;
--(void)save
+-(void)save;
 @end
