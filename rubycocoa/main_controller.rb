@@ -70,8 +70,6 @@ class MainController < NSObject
     alert.setInformativeText(title)
     alert.setAlertStyle(NSCriticalAlertStyle)
     alert.beginSheetModalForWindow_modalDelegate_didEndSelector_contextInfo(@window, self, nil, nil)
-    log(e.message)
-    log(e.backtrace)
   end
 
   def render_html(html, url = nil)
