@@ -43,7 +43,7 @@ class MainController < NSObject
   end
   
   def start_tcp_server
-    server = TCPServer.open("localhost", 6429)
+    server = TCPServer.open("0.0.0.0", 6429)
     Thread.new do
       loop do
         sock = server.accept
