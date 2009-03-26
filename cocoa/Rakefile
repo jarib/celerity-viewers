@@ -21,6 +21,19 @@ task :install => %w[build] do
   mv EXECUTABLE, "/Applications", :verbose => true
 end
 
+desc 'Try sending a web page to the socket'
+task :try_socket do
+  require 'socket'
+  require "open-uri"
+  require "iconv"
+  
+  html = Iconv.conv("utf-8", "iso-8859-1", open("http://www.finn.no/").read)
+  p :html => html
+  s = TCPSocket.new("localhost", 6429)
+  s.write html
+  s.close
+end
+
 desc 'Build and run'
 task :default => %w[build run]
 

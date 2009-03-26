@@ -17,7 +17,11 @@
 - (void)setupSocket
 {
 	socketPort = [[NSSocketPort alloc] initWithTCPPort:6429];
-	NSLog(@"socketPort: %@", socketPort);
+	if(!socketPort)
+	{
+        [self alert:@"Could not bind to port (6429)."];
+        return;
+	}
 	fileHandle = [[NSFileHandle alloc] initWithFileDescriptor:[socketPort socket]
 											   closeOnDealloc:YES];
 	
@@ -57,6 +61,33 @@
 		NSString* html = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 		[[webView mainFrame] loadHTMLString:html baseURL:nil];
 	}	
+}
+
+- (void)alert:(NSString*)message
+{
+    NSAlert* alert = [[[NSAlert alloc] init] autorelease];
+    [alert setMessageText: @"Error!"];
+    [alert setInformativeText: message];
+    [alert setAlertStyle: NSCriticalAlertStyle];
+    [alert beginSheetModalForWindow:window modalDelegate:self didEndSelector:nil contextInfo:nil];
+}
+
+// should take (NSString*)path here
+- (void)save
+{
+    NSString* path = @"/tmp/celerity_viewer.png";
+
+    NSView* viewPort = [[[webView mainFrame] frameView] documentView];
+    NSRect bounds   = [viewPort bounds];
+    NSBitmapImageRep* imageRep = [viewPort bitmapImageRepForCachingDisplayInRect:bounds];
+    
+    [viewPort cacheDisplayInRect:bounds toBitmapImageRep:imageRep];
+
+    if(!imageRep)
+        return;
+    
+    [[imageRep representationUsingType:NSPNGFileType properties:nil] writeToFile:path atomically:true];
+    NSLog(@"wrote screenshot to %@", path);
 }
 
 - (void)dealloc
