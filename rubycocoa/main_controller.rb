@@ -16,29 +16,41 @@ class MainController < NSObject
     setup_panel
     load_url
     start_drb
+    # start_tcp_server
   rescue
     log $!
     raise $!
   end
-  
+
   def setup_panel
     @window.floatingPanel = false
   end
-  
+
   def setup_webview
     NSUserDefaults.standardUserDefaults.setObject_forKey('YES', 'WebKitDeveloperExtras')
     @web_view.preferences.setShouldPrintBackgrounds(true)
     @web_view.frameLoadDelegate = self
   end
-  
+
   def setup_counters
     @save_count = 0
     @update_count = 0
     @status_label.stringValue = "Updated: #{@update_count} times."
   end
-  
+
   def start_drb
     DRb.start_service("druby://127.0.0.1:6429", self)
+  end
+  
+  def start_tcp_server
+    server = TCPServer.open("localhost", 6429)
+    Thread.new do
+      loop do
+        sock = server.accept
+        render_html(sock.read)
+        sock.close
+      end
+    end
   end
 
   def load_url(sender = @text_field)
@@ -78,19 +90,19 @@ class MainController < NSObject
   def save(path = nil)
     @save_count += 1
     return @web_view.print(nil) unless path
-    
+
     viewport        = @web_view.mainFrame.frameView.documentView
     viewport_bounds = viewport.bounds
     image_rep       = viewport.bitmapImageRepForCachingDisplayInRect(viewport_bounds)
     FileUtils.mkdir_p File.dirname(path)
-    
+
     viewport.cacheDisplayInRect_toBitmapImageRep(viewport_bounds, image_rep)
-    
+
     return unless image_rep
-    
+
     image_rep.representationUsingType_properties(NSPNGFileType, nil).writeToFile_atomically(path, true)
     log("Wrote screenshot to #{path}")
-    
+
     @save_count
   rescue => e
     log($!, $@)
@@ -100,11 +112,11 @@ class MainController < NSObject
   #
   # delegate methods
   #
-  
+
   def windowWillClose(sender)
     NSApplication.sharedApplication.terminate(0)
   end
-  
+
   def webView_didStartProvisionalLoadForFrame(view, frame)
     @text_field.stringValue = view.mainFrameURL
   end
@@ -116,4 +128,3 @@ class MainController < NSObject
   #   retval
   # end
 end
-

@@ -12,6 +12,7 @@
 }
 
 -(void)awakeFromNib;
+-(void)applicationWillTerminate;
 -(void)setupWebView;
 -(void)setupSocket;
 -(void)handleConnection:(NSNotification *)notification;

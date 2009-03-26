@@ -3,7 +3,6 @@ require "rake"
 require "rake/clean"
 
 EXECUTABLE = "build/Release/CelerityViewer.app"
-
 CLEAN << 'build'
 
 desc 'Build CelerityViewer.app'
@@ -27,8 +26,8 @@ task :try_socket do
   require "open-uri"
   require "iconv"
   
+  # socket only accepts utf-8 content (usually ensured by celerity) 
   html = Iconv.conv("utf-8", "iso-8859-1", open("http://www.finn.no/").read)
-  p :html => html
   s = TCPSocket.new("localhost", 6429)
   s.write html
   s.close

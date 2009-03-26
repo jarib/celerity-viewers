@@ -30,6 +30,8 @@ end
 # Debugger.wait_connection = true
 # Debugger.start_server
 
+Thread.abort_on_exception = true
+
 NSApplication.sharedApplication
 NSApplicationMain(0, nil)
 

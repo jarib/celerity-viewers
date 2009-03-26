@@ -49,7 +49,11 @@
 	
 	[fileHandle acceptConnectionInBackgroundAndNotify];
 	if(remoteFileHandle) 
-		[self updateWithData:[remoteFileHandle readDataToEndOfFile]]; 
+	{
+	    [self updateWithData:[remoteFileHandle readDataToEndOfFile]]; 
+        [remoteFileHandle closeFile];
+	}
+		
 }
 
 
@@ -93,7 +97,7 @@
 - (void)dealloc
 {
     [nc removeObserver:self];
-	[fileHandle release];
+    [fileHandle release];
     [socketPort release];
     [super dealloc];
 }
