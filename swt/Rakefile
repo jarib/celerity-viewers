@@ -6,7 +6,6 @@ class JarCreator
   def initialize(opts = {})
     @opts = opts
     @verbose = opts[:verbose]
-    @cwd = Dir.pwd
     @pkg_dir = "pkg"
     @target_dir = "classes"
     @ruby_files = Dir['**/*.rb']
@@ -32,13 +31,12 @@ class JarCreator
       cp f, @target_dir, :verbose => @verbose
     end
 
-    chdir @target_dir, :verbose => @verbose
-    jar_files.each do |file|
-      extract_jar(file)
-      rm_f file, :verbose => @verbose
+    chdir(@target_dir, :verbose => @verbose) do
+      jar_files.each do |file|
+        extract_jar(file)
+        rm_f file, :verbose => @verbose
+      end
     end
-
-    chdir @cwd, :verbose => @verbose
   end
 
   # def create_manifest
