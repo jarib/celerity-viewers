@@ -105,13 +105,13 @@ class WinJarCreator < JarCreator
   end
 
   def file_name
-    "#{@pkg_dir}/celerity-swt-win-jruby#{JRUBY_VERSION}.jar"
+    "#{@pkg_dir}/celerityviewer-swt-win-jruby#{JRUBY_VERSION}.jar"
   end
 end
 
 class MacJarCreator < JarCreator
   def file_name
-    "#{@pkg_dir}/celerity-swt-mac-jruby#{JRUBY_VERSION}.jar"
+    "#{@pkg_dir}/celerityviewer-swt-mac-jruby#{JRUBY_VERSION}.jar"
   end
 
   def jar_files
@@ -126,7 +126,7 @@ end
 
 class LinuxJarCreator < JarCreator
   def file_name
-    "#{@pkg_dir}/celerity-swt-linux-jruby#{JRUBY_VERSION}.jar"
+    "#{@pkg_dir}/celerityviewer-swt-linux-jruby#{JRUBY_VERSION}.jar"
   end
 
   def jar_files
@@ -136,17 +136,17 @@ end
 
 namespace :jar do
 
-  desc "Compile and create celerity-swt-win-jruby#{JRUBY_VERSION}.jar"
+  desc "Compile and create celerityviewer-swt-win-jruby#{JRUBY_VERSION}.jar"
   task :win do
     WinJarCreator.new(:verbose => true).build
   end
 
-  desc "Compile and create celerity-swt-mac-jruby#{JRUBY_VERSION}.jar"
+  desc "Compile and create celerityviewer-swt-mac-jruby#{JRUBY_VERSION}.jar"
   task :mac do
     MacJarCreator.new(:verbose => true).build
   end
 
-  desc "Compile and create celerity-swt-linux-jruby#{JRUBY_VERSION}.jar"
+  desc "Compile and create celerityviewer-swt-linux-jruby#{JRUBY_VERSION}.jar"
   task :linux do
     LinuxJarCreator.new(:verbose => true).build
   end
