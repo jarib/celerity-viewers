@@ -134,6 +134,17 @@ class LinuxJarCreator < JarCreator
   end
 end
 
+class Linux64BitJarCreator < JarCreator
+  def file_name
+    "#{@pkg_dir}/celerityviewer-swt64-linux-jruby#{JRUBY_VERSION}.jar"
+  end
+  
+  def jar_files
+    ['swt-linux-64bit.jar']
+  end
+  
+end
+
 namespace :jar do
 
   desc "Compile and create celerityviewer-swt-win-jruby#{JRUBY_VERSION}.jar"
@@ -149,6 +160,11 @@ namespace :jar do
   desc "Compile and create celerityviewer-swt-linux-jruby#{JRUBY_VERSION}.jar"
   task :linux do
     LinuxJarCreator.new(:verbose => true).build
+  end
+
+  desc "Compile and create celerityviewer-swt64-linux-jruby#{JRUBY_VERSION}.jar"
+  task :linux_64 do
+    Linux64BitJarCreator.new(:verbose => true, :x86_64 => true).build
   end
 
   task :guess do
