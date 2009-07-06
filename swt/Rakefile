@@ -124,9 +124,9 @@ class MacJarCreator < JarCreator
   end
 end
 
-class LinuxJarCreator < JarCreator
+class Linux32BitJarCreator < JarCreator
   def file_name
-    "#{@pkg_dir}/celerityviewer-swt-linux-jruby#{JRUBY_VERSION}.jar"
+    "#{@pkg_dir}/celerityviewer-swt32-linux-jruby#{JRUBY_VERSION}.jar"
   end
 
   def jar_files
@@ -157,28 +157,24 @@ namespace :jar do
     MacJarCreator.new(:verbose => true).build
   end
 
-  desc "Compile and create celerityviewer-swt-linux-jruby#{JRUBY_VERSION}.jar"
-  task :linux do
-    LinuxJarCreator.new(:verbose => true).build
+  desc "Compile and create celerityviewer-swt32-linux-jruby#{JRUBY_VERSION}.jar"
+  task :linux32 do
+    Linux32BitJarCreator.new(:verbose => true).build
   end
 
   desc "Compile and create celerityviewer-swt64-linux-jruby#{JRUBY_VERSION}.jar"
-  task :linux_64 do
-    Linux64BitJarCreator.new(:verbose => true, :x86_64 => true).build
+  task :linux64 do
+    Linux64BitJarCreator.new(:verbose => true).build
   end
 
   task :guess do
-    if RUBY_PLATFORM =~ /java/
-      os_name = java.lang.System.getProperty("os.name")
-    else
-      os_name = RUBY_PLATFORM
-    end
+    os_name = java.lang.System.getProperty("os.name")
 
     task = case os_name
            when /darwin|Mac OS X/i
              'jar:mac'
            when /linux/i
-             'jar:linux'
+             "jar:linux" + (java.lang.System.getProperty("os.arch") =~ /x86_64/ ? '64' : '32')
            when /win32|mingw|windows/i
              'jar:win'
            else
