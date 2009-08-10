@@ -4,7 +4,7 @@ require "uri"
 require "fileutils"
 
 DRb.install_acl(ACL.new(%w[deny all allow 127.0.0.1]))
-
+Thread.abort_on_exception = true
 
 class MainController < NSObject
   ib_outlets :web_view, :text_field, :status_label, :window
@@ -15,8 +15,8 @@ class MainController < NSObject
     setup_counters
     setup_panel
     load_url
-    start_drb
-    # start_tcp_server
+    # start_drb
+    Thread.new { start_tcp_server }
   rescue
     log $!
     raise $!
@@ -41,16 +41,32 @@ class MainController < NSObject
   def start_drb
     DRb.start_service("druby://127.0.0.1:6429", self)
   end
-  
+
   def start_tcp_server
-    server = TCPServer.open("0.0.0.0", 6429)
-    Thread.new do
-      loop do
-        sock = server.accept
-        render_html(sock.read)
-        sock.close
-      end
+    server = TCPServer.new("0.0.0.0", 6429)
+
+    loop do
+      handle_socket(server.accept)
     end
+  end
+
+  def handle_socket(socket)
+    log(:accepted => socket)
+
+    # get Content-Length
+    buf = ''
+    until buf =~ /\n\n\z/
+      buf << socket.read(1).to_s
+      log :buf => buf
+    end
+
+    length = buf[/Content-Length: (\d+)/, 1].to_i
+    log :length => length
+    # get JSON
+    data = JSON.parse(socket.read(length))
+    render_html data['html'], data['url']
+  rescue => e
+    log e
   end
 
   def load_url(sender = @text_field)

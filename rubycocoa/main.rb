@@ -3,16 +3,18 @@ begin
 require 'rubygems'
 rescue LoadError
 end
+
 require 'osx/cocoa'
 require 'pathname'
+require 'json'
 
 include OSX
 require_framework 'WebKit'
 
 
 def log(*args)
-	args.each do |m|
-    NSLog m.inspect
+  File.open("/tmp/cvlog.txt", "a") do |f|
+  	args.each { |m| f.puts m.inspect }
 	end
 end
 
