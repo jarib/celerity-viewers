@@ -27,7 +27,7 @@ class CelerityViewer
   attr_accessor :inspector, :inspector_options
 
   def initialize
-    DRb.start_service("druby://127.0.0.1:6429", self)
+    start_server
     @style = ENV['SWT_MOZILLA'] ? SWT::MOZILLA : SWT::NONE
 
     @inspector_options = INSPECTORS.keys
@@ -90,6 +90,10 @@ class CelerityViewer
 
   def reset
     render_html(@html)
+  end
+  
+  def start_server
+    
   end
 
 end
