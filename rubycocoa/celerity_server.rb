@@ -10,7 +10,7 @@ module CelerityServer
         begin
           handle_socket socket
         rescue => e
-          log e
+          log e.message, e.backtrace
         end
       end
     }
@@ -21,6 +21,7 @@ module CelerityServer
 
     until socket.closed?
       data = read_from socket
+      return if data.nil?
 
       case data['method']
       when 'render_html'
@@ -33,14 +34,13 @@ module CelerityServer
 
   def read_from(socket)
     buf = ''
-    until buf =~ /\n\n\z/
+    until buf =~ /\n\n\z/ || socket.eof? || socket.closed?
       buf << socket.read(1).to_s
     end
 
-    log :buf => buf if $DEBUG
-    length = buf[/Content-Length: (\d+)/, 1].to_i
-    log :length => length if $DEBUG
+    return if buf.empty?
 
-    JSON.parse(socket.read(length))
+    length = buf[/Content-Length: (\d+)/, 1].to_i
+    JSON.parse socket.read(length)
   end
 end

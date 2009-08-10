@@ -21,6 +21,7 @@ module CelerityServer
 
     until socket.closed?
       data = read_from socket
+      return if data.nil?
 
       case data['method']
       when 'render_html'
@@ -33,12 +34,13 @@ module CelerityServer
 
   def read_from(socket)
     buf = ''
-    until buf =~ /\n\n\z/
+    until buf =~ /\n\n\z/ || socket.eof? || socket.closed?
       buf << socket.read(1).to_s
     end
 
-    length = buf[/Content-Length: (\d+)/, 1].to_i
+    return if buf.empty?
 
-    JSON.parse(socket.read(length))
+    length = buf[/Content-Length: (\d+)/, 1].to_i
+    JSON.parse socket.read(length)
   end
 end
