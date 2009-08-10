@@ -1,12 +1,9 @@
-require "drb"
-require "drb/acl"
 require "uri"
 require "fileutils"
 
-DRb.install_acl(ACL.new(%w[deny all allow 127.0.0.1]))
-
-
 class MainController < NSObject
+  include CelerityServer
+
   ib_outlets :web_view, :text_field, :status_label, :window
 
   def awakeFromNib
@@ -15,10 +12,10 @@ class MainController < NSObject
     setup_counters
     setup_panel
     load_url
-    start_drb
-    # start_tcp_server
+
+    Thread.new { start_server } if have_json
   rescue
-    log $!
+    log $!, $@
     raise $!
   end
 
@@ -38,19 +35,12 @@ class MainController < NSObject
     @status_label.stringValue = "Updated: #{@update_count} times."
   end
 
-  def start_drb
-    DRb.start_service("druby://127.0.0.1:6429", self)
-  end
-  
-  def start_tcp_server
-    server = TCPServer.open("0.0.0.0", 6429)
-    Thread.new do
-      loop do
-        sock = server.accept
-        render_html(sock.read)
-        sock.close
-      end
-    end
+  def have_json
+    require "json"
+    true
+  rescue LoadError => e
+    render_html("<h1>You need to run <pre>sudo gem install json</pre> before using this app.</h1>")
+    false
   end
 
   def load_url(sender = @text_field)
@@ -118,11 +108,4 @@ class MainController < NSObject
   def webView_didStartProvisionalLoadForFrame(view, frame)
     @text_field.stringValue = view.mainFrameURL
   end
-
-  # for debugging
-  # def respond_to?(*args)
-  #   retval = super
-  #   p :respond_to => args, :retval => retval
-  #   retval
-  # end
 end

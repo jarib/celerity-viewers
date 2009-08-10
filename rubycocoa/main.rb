@@ -3,18 +3,25 @@ begin
 require 'rubygems'
 rescue LoadError
 end
+
 require 'osx/cocoa'
 require 'pathname'
-
 include OSX
 require_framework 'WebKit'
 
 
+# def log(*args)
+#   File.open("/tmp/cvlog.txt", "a") do |f|
+#     args.each { |m| f.puts m.inspect }
+#   end
+# end
+
 def log(*args)
 	args.each do |m|
-    NSLog m.inspect
+		OSX.NSLog m.inspect
 	end
 end
+
 
 def _(key)
 	NSLocalizedString(key, '').to_s

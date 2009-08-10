@@ -1,6 +1,25 @@
 require "rubygems"
 require "uri"
 
+missing_gems = []
+
+begin
+  require "json"
+rescue LoadError
+  missing_gems << "json-jruby"
+end
+
+begin 
+  require "facets" # glimmer dep.
+rescue LoadError
+  missing_gems << "facets"
+end
+
+unless missing_gems.empty?
+  $stderr.puts "You need to run `jruby -S gem install #{missing_gems.join ' '}`"
+  exit 1
+end
+
 begin
   require "swt.jar"
 rescue LoadError => e
@@ -8,12 +27,10 @@ rescue LoadError => e
 end
 
 require "glimmer/src/swt"
-require "drb"
-require "drb/acl"
-
-DRb.install_acl(ACL.new(%w[deny all allow 127.0.0.1]))
+require "celerity_server"
 
 class CelerityViewer
+  include CelerityServer
   include_package 'org.eclipse.swt'
   include_package 'org.eclipse.swt.layout'
 
@@ -27,7 +44,7 @@ class CelerityViewer
   attr_accessor :inspector, :inspector_options
 
   def initialize
-    DRb.start_service("druby://127.0.0.1:6429", self)
+    Thread.new { start_server }
     @style = ENV['SWT_MOZILLA'] ? SWT::MOZILLA : SWT::NONE
 
     @inspector_options = INSPECTORS.keys
@@ -79,7 +96,7 @@ class CelerityViewer
   rescue
     puts $!, $@
   end
-  
+
   def save(path = nil)
     # does nothing
   end
