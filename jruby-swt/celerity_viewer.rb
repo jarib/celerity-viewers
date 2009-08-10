@@ -2,18 +2,23 @@ require "rubygems"
 require "uri"
 
 begin
+  require "json"
+rescue LoadError
+  $stderr.puts "You need to run `gem install json`"
+  exit 1
+end
+
+begin
   require "swt.jar"
 rescue LoadError => e
   puts e.message + " (inside jar?)"
 end
 
 require "glimmer/src/swt"
-require "drb"
-require "drb/acl"
-
-DRb.install_acl(ACL.new(%w[deny all allow 127.0.0.1]))
+require "celerity_server"
 
 class CelerityViewer
+  include CelerityServer
   include_package 'org.eclipse.swt'
   include_package 'org.eclipse.swt.layout'
 
@@ -79,7 +84,7 @@ class CelerityViewer
   rescue
     puts $!, $@
   end
-  
+
   def save(path = nil)
     # does nothing
   end
@@ -90,10 +95,6 @@ class CelerityViewer
 
   def reset
     render_html(@html)
-  end
-  
-  def start_server
-    
   end
 
 end
