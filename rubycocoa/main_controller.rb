@@ -35,10 +35,6 @@ class MainController < NSObject
     @status_label.stringValue = "Updated: #{@update_count} times."
   end
 
-  def start_drb
-    DRb.start_service("druby://127.0.0.1:6429", self)
-  end
-
   def have_json
     require "json"
     true
