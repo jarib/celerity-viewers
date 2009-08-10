@@ -1,10 +1,6 @@
-require "drb"
-require "drb/acl"
 require "uri"
 require "fileutils"
-
-DRb.install_acl(ACL.new(%w[deny all allow 127.0.0.1]))
-Thread.abort_on_exception = true
+require "socket"
 
 class MainController < NSObject
   ib_outlets :web_view, :text_field, :status_label, :window
@@ -15,10 +11,11 @@ class MainController < NSObject
     setup_counters
     setup_panel
     load_url
-    # start_drb
-    Thread.new { start_tcp_server }
+    if have_json
+      Thread.new { start_tcp_server }
+    end
   rescue
-    log $!
+    log $!, $@
     raise $!
   end
 
@@ -42,29 +39,36 @@ class MainController < NSObject
     DRb.start_service("druby://127.0.0.1:6429", self)
   end
 
+  def have_json
+    require "json"
+    true
+  rescue LoadError => e
+    render_html("<h1>You need to run <pre>sudo gem install json</pre> before using this app.</h1>")
+    false
+  end
+
   def start_tcp_server
     server = TCPServer.new("0.0.0.0", 6429)
 
     loop do
-      handle_socket(server.accept)
+      s = server.accept
+      Thread.new(s) { |socket| handle_socket socket }
     end
   end
 
   def handle_socket(socket)
     log(:accepted => socket)
 
-    # get Content-Length
-    buf = ''
-    until buf =~ /\n\n\z/
-      buf << socket.read(1).to_s
-      log :buf => buf
-    end
+    until socket.closed?
+      data = read_from socket
 
-    length = buf[/Content-Length: (\d+)/, 1].to_i
-    log :length => length
-    # get JSON
-    data = JSON.parse(socket.read(length))
-    render_html data['html'], data['url']
+      case data['method']
+      when 'render_html'
+        render_html data['html'], data['url']
+      when 'save'
+        save data['path']
+      end
+    end
   rescue => e
     log e
   end
@@ -135,10 +139,16 @@ class MainController < NSObject
     @text_field.stringValue = view.mainFrameURL
   end
 
-  # for debugging
-  # def respond_to?(*args)
-  #   retval = super
-  #   p :respond_to => args, :retval => retval
-  #   retval
-  # end
+  def read_from(socket)
+    buf = ''
+    until buf =~ /\n\n\z/
+      buf << socket.read(1).to_s
+    end
+
+    log :buf => buf if $DEBUG
+    length = buf[/Content-Length: (\d+)/, 1].to_i
+    log :length => length if $DEBUG
+
+    JSON.parse(socket.read(length))
+  end
 end

@@ -6,8 +6,6 @@ end
 
 require 'osx/cocoa'
 require 'pathname'
-require 'json'
-
 include OSX
 require_framework 'WebKit'
 

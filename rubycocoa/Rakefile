@@ -12,7 +12,7 @@ APP_VERSION = `git rev-parse HEAD`[0,7].chomp
 RESOURCES   = ['*.rb', '*.lproj', 'Credits.*', '*.icns']
 PKGINC      = [TARGET, 'README.markdown']
 COPYRIGHT   = "Copyright © 2008 FINN.no AS"
-BUNDLEID    = "com.celerity.#{APPNAME.downcase}"
+BUNDLEID    = "no.finn.celerity.#{APPNAME.downcase}"
 #PUBLISH   = 'yourname@yourhost:path'
 
 CLEAN.include ['**/.*.sw?', '*.dmg', TARGET, 'image', 'a.out', APPNAME, 'pkg']
@@ -32,10 +32,10 @@ task :package => [:clean, 'pkg', TARGET] do
 	PKGINC.each do |item|
 	  cp_r item, "image", :verbose => true
   end
-  
+
 	puts 'Creating Image...'
 	sh %{hdiutil create -volname #{name} -srcfolder image #{name}.dmg}
-	
+
 	rm_rf "image", :verbose => true
 	mv "#{name}.dmg", "pkg"
 end
@@ -46,7 +46,7 @@ task :publish => [:package] do
 	_, host, path = *PUBLISH.match(/^([^\s]+):(.+)$/)
 	path = Pathname.new path
 	puts "Publish: Host: #{host}, Path: #{path}"
-	
+
 	sh %Q{
   	scp pkg/IIrcv.#{APP_VERSION}.dmg #{PUBLISH}/pkg
   	scp CHANGES #{PUBLISH}/pkg
