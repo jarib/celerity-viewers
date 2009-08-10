@@ -1,8 +1,9 @@
 require "uri"
 require "fileutils"
-require "socket"
 
 class MainController < NSObject
+  include CelerityServer
+  
   ib_outlets :web_view, :text_field, :status_label, :window
 
   def awakeFromNib
@@ -11,9 +12,8 @@ class MainController < NSObject
     setup_counters
     setup_panel
     load_url
-    if have_json
-      Thread.new { start_tcp_server }
-    end
+
+    Thread.new { start_server } if have_json
   rescue
     log $!, $@
     raise $!
@@ -46,10 +46,16 @@ class MainController < NSObject
   def start_tcp_server
     server = TCPServer.new("0.0.0.0", 6429)
 
-    loop do
+    loop {
       s = server.accept
-      Thread.new(s) { |socket| handle_socket socket }
-    end
+      Thread.new(s) do |socket|
+        begin
+          handle_socket socket
+        rescue => e 
+          log e
+        end
+      end
+    }
   end
 
   def handle_socket(socket)
@@ -65,8 +71,6 @@ class MainController < NSObject
         save data['path']
       end
     end
-  rescue => e
-    log e
   end
 
   def load_url(sender = @text_field)
@@ -133,18 +137,5 @@ class MainController < NSObject
 
   def webView_didStartProvisionalLoadForFrame(view, frame)
     @text_field.stringValue = view.mainFrameURL
-  end
-
-  def read_from(socket)
-    buf = ''
-    until buf =~ /\n\n\z/
-      buf << socket.read(1).to_s
-    end
-
-    log :buf => buf if $DEBUG
-    length = buf[/Content-Length: (\d+)/, 1].to_i
-    log :length => length if $DEBUG
-
-    JSON.parse(socket.read(length))
   end
 end
