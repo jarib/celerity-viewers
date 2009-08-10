@@ -1,10 +1,22 @@
 require "rubygems"
 require "uri"
 
+missing_gems = []
+
 begin
   require "json"
 rescue LoadError
-  $stderr.puts "You need to run `gem install json`"
+  missing_gems << "json-jruby"
+end
+
+begin 
+  require "facets" # glimmer dep.
+rescue LoadError
+  missing_gems << "facets"
+end
+
+unless missing_gems.empty?
+  $stderr.puts "You need to run `jruby -S gem install #{missing_gems.join ' '}`"
   exit 1
 end
 
@@ -32,7 +44,7 @@ class CelerityViewer
   attr_accessor :inspector, :inspector_options
 
   def initialize
-    start_server
+    Thread.new { start_server }
     @style = ENV['SWT_MOZILLA'] ? SWT::MOZILLA : SWT::NONE
 
     @inspector_options = INSPECTORS.keys
