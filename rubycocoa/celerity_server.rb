@@ -24,7 +24,7 @@ module CelerityServer
       return if data.nil?
 
       case data['method']
-      when 'render_html'
+      when 'page_changed'
         render_html data['html'], data['url']
       when 'save'
         save data['path']
