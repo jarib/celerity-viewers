@@ -13,8 +13,9 @@ The RubyCocoa version has the WebKit inspector enabled - right-click and _Inspec
 future
 ======
 
-- replace drb with tcp sockets
 - look at [jdic](https://jdic.dev.java.net/) as possible swt alternative
+- fix cocoa viewer
+- other languages? Qt, Java
 
 [cel]: http://celerity.rubyforge.org "Celerity Home Page"
 [modi]: http://slayeroffice.com/tools/modi/v2.0/modi_help.html
