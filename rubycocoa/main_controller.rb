@@ -3,7 +3,7 @@ require "fileutils"
 
 class MainController < NSObject
   include CelerityServer
-  
+
   ib_outlets :web_view, :text_field, :status_label, :window
 
   def awakeFromNib
@@ -41,36 +41,6 @@ class MainController < NSObject
   rescue LoadError => e
     render_html("<h1>You need to run <pre>sudo gem install json</pre> before using this app.</h1>")
     false
-  end
-
-  def start_tcp_server
-    server = TCPServer.new("0.0.0.0", 6429)
-
-    loop {
-      s = server.accept
-      Thread.new(s) do |socket|
-        begin
-          handle_socket socket
-        rescue => e 
-          log e
-        end
-      end
-    }
-  end
-
-  def handle_socket(socket)
-    log(:accepted => socket)
-
-    until socket.closed?
-      data = read_from socket
-
-      case data['method']
-      when 'render_html'
-        render_html data['html'], data['url']
-      when 'save'
-        save data['path']
-      end
-    end
   end
 
   def load_url(sender = @text_field)
