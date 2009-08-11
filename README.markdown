@@ -16,7 +16,7 @@ future
 ======
 
 - look at [jdic](https://jdic.dev.java.net/) as possible swt alternative
-- fix cocoa viewer
+- fix cocoa viewer (json libs: [1](http://code.google.com/p/json-framework/), [2](http://zachwaugh.com/2009/01/how-to-use-json-in-cocoaobjective-c/))
 - other languages? Qt, Java
 
 [cel]: http://celerity.rubyforge.org "Celerity Home Page"
