@@ -1,5 +1,8 @@
 require "rake"
 
+APPNAME     = "CelerityViewer"
+APP_VERSION = `git rev-parse HEAD`[0,7].chomp
+
 module System
   module_function
 
@@ -74,6 +77,19 @@ when :macosx
   desc 'Install to /Applications'
   task :install => :compile do
     mv "./QtCelerityViewer.app", "/Applications", :verbose => true
+  end
+
+  desc 'Buld QtCelerityViewer.dmg'
+  task :dmg => :compile do
+    name = "#{APPNAME}#{APP_VERSION}"
+  	mkdir "image", :verbose => true
+  	cp_r "./QtCelerityViewer.app", "image", :verbose => true
+
+  	puts 'Creating Image...'
+  	sh %{hdiutil create -volname #{name} -srcfolder image #{name}.dmg}
+
+  	rm_rf "image", :verbose => true
+  	mv "#{name}.dmg", "pkg"
   end
 
   puts <<-TEXT
