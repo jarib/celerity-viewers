@@ -4,8 +4,11 @@ require "rake/clean"
 APP_NAME     = "QtCelerityViewer"
 APP_VERSION = `git rev-parse HEAD`[0,7].chomp
 
-CLEAN.include("QtCelerityViewer.{app,xcodeproj}", "*.o")
-CLOBBER.include("moc_*.cpp")
+CLEAN.include   "QtCelerityViewer.{app,xcodeproj}",
+                "*.o"
+
+CLOBBER.include "moc_*.cpp",
+                "Makefile*"
 
 module System
   module_function
@@ -73,7 +76,12 @@ end
 
 desc 'compile'
 task :compile => :deps do
-  sh "qmake && make"
+  args         = case System.platform
+                 when :macosx
+                   ["-spec macx-g++", nil]
+                 end
+
+  sh "qmake #{args.first} && make #{args.last}"
 end
 
 case System.platform
@@ -97,10 +105,20 @@ when :macosx
   	rm_rf "image", :verbose => true
   end
 
+  desc 'compile and run'
+  task :run => :compile do
+    sh "open QtCelerityViewer.app"
+  end
+
 when :linux
   desc "create #{APP_NAME}-#{APP_VERSION}.tgz"
   task :package => :compile do
     sh "tar zcf #{APP_NAME}-#{APP_VERSION}.tgz ./QtCelerityViewer"
+  end
+
+  desc 'compile and run'
+  task :run => :compile do
+    sh "./QtCelerityViewer"
   end
 end
 
@@ -121,4 +139,16 @@ task :default do
   end
 end
 
+task :test do
+  sh "jruby <<< '#{<<-RUBY}'"
+  require "rubygems"
+  require "celerity"
 
+  c = Celerity::Browser.new
+  c.goto "google.com"
+  c.close
+
+  c = Celerity::Browser.new
+  c.goto "yahoo.com"
+  RUBY
+end
