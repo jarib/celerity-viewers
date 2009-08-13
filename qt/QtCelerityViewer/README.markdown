@@ -4,7 +4,7 @@ Please help if you have a Windows machine with dev tools available! :)
 Binaries
 --------
 
-Binary downloads will be available on [GitHub](http://github.com/jarib/celerity-viewers/downloads).
+If you don't want to compile the app yourself, binary downloads will be available on [GitHub](http://github.com/jarib/celerity-viewers/downloads).
 In addition, you need the Qt frameworks:
 
   * Ubuntu/Debian:
@@ -49,7 +49,7 @@ Debian-based linux:
 
 OS X:
 
-    $ curl -O http://get.qtsoftware.com/qt/source/qt-mac-opensource-4.5.2.dmg && open qt-mac-opensource-4.5.2.dmg
+    $ curl -O http://get.qtsoftware.com/qtsdk/qt-sdk-mac-opensource-2009.03.1.dmg && open qt-sdk-mac-opensource-2009.03.1.dmg
     $ port install cmake
     $ qmake && make
 

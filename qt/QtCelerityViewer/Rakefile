@@ -52,8 +52,8 @@ task :deps do
     end
 
     unless File.directory?("/Library/Frameworks/QtWebKit.framework")
-      sh "curl -O http://get.qtsoftware.com/qt/source/qt-mac-opensource-4.5.2.dmg && open qt-mac-opensource-4.5.2.dmg"
-      abort("please complete the Qt framework installer")
+      sh "curl -O http://get.qtsoftware.com/qtsdk/qt-sdk-mac-opensource-2009.03.1.dmg && open qt-sdk-mac-opensource-2009.03.1.dmg"
+      abort("please complete the Qt SDK installer")
     end
   when :linux
     unless `dpkg -L libqt4-dev`.include?("libQtWebKit.so")
