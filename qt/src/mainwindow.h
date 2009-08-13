@@ -11,6 +11,8 @@
 #define MAINWINDOW_H
 
 #include <QtGui/QMainWindow>
+#include <QWebView>
+#include <QLineEdit>
 
 class MainWindow : public QMainWindow
 {
@@ -19,6 +21,17 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    QWebView *view;
+
+public slots:
+    void setLocation(QString location);
+
+private:
+    QLineEdit *locationEdit;
+    void createLocationEdit();
+    void createToolBar();
+    void createWebView();
 };
 
 #endif // MAINWINDOW_H

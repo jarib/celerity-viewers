@@ -74,8 +74,6 @@ void Server::acceptConnection()
 
 void Server::readSocket()
 {
-    qDebug() << "readSocket() ";
-
     int available = socket->bytesAvailable();
     while(available > 0) {
          QByteArray buf = socket->read(16);

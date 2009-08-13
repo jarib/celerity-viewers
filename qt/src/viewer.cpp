@@ -17,23 +17,20 @@
 
 namespace celerity {
 
-Viewer::Viewer() : webView(new QWebView())
+Viewer::Viewer()
 {
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-
     connect(&server, SIGNAL(jsonReceived(QByteArray)), this, SLOT(processJson(QByteArray)));
-
     server.run();
-
-    webView->setHtml("<p style=\"font-size: 12px\">Loading QtCelerityViewer...</pre>");
-    webView->show();
-    webView->load(QUrl("http://celerity.rubyforge.org"));
 }
 
 Viewer::~Viewer()
 {
     server.stop();
-    delete webView;
+}
+
+void Viewer::setWebView(QWebView* view)
+{
+    webView = view;
 }
 
 void Viewer::processJson(QByteArray json)
@@ -42,8 +39,6 @@ void Viewer::processJson(QByteArray json)
 
     QString meth = req["method"].toString();
     QString html = req["html"].toString();
-
-    qDebug() << "method: " << meth;
 
     if(meth == "page_changed" && html != lastHtml) {
         lastHtml = html;
@@ -58,6 +53,7 @@ void Viewer::processJson(QByteArray json)
 
 void Viewer::renderHtml(QString html, QUrl baseUrl)
 {
+    emit urlChanged(baseUrl.toString());
     webView->setHtml(html, baseUrl);
 }
 

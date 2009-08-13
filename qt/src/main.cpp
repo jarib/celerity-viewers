@@ -17,10 +17,17 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+
+    MainWindow w;
+
     celerity::Viewer* viewer = new celerity::Viewer();
+    viewer->setWebView(w.view);
+    w.connect(viewer, SIGNAL(urlChanged(QString)), SLOT(setLocation(QString)));
 
+    w.show();
 
-    int result = a.exec();
-    delete viewer;
-    return result;
+//    int result = a.exec();
+//    delete viewer;
+//    return result;
+    return a.exec();
 }

@@ -26,6 +26,11 @@ namespace celerity {
         Viewer();
         ~Viewer();
 
+        void setWebView(QWebView* webView);
+
+    signals:
+        void urlChanged(QString newUrl);
+
      public slots:
         void processJson(QByteArray json);
         void renderHtml(QString, QUrl baseUrl = QUrl());
