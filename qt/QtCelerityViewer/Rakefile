@@ -76,6 +76,8 @@ case System.platform
 when :macosx
   desc 'install to /Applications'
   task :install => :compile do
+    file = "/Applications/QtCelerityViewer.app"
+    rm file if File.exist?(file)
     mv "./QtCelerityViewer.app", "/Applications", :verbose => true
   end
 
