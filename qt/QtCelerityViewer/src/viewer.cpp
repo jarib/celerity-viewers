@@ -12,6 +12,7 @@
 #include <QWebFrame>
 #include <QVariantMap>
 #include <QPrinter>
+#include <QFile>
 
 
 namespace celerity {
@@ -46,9 +47,10 @@ void Viewer::processJson(QByteArray json)
         lastHtml = html;
         qDebug() << "updating page: " << html.size();
         renderHtml(html, QUrl(req["url"].toString()) );
-    }
-    else if(meth == "save") {
+    } else if(meth == "save") {
         save( req["path"].toString() );
+    } else if(meth == "save_render_tree") {
+        saveRenderTree( req["path"].toString() );
     }
 }
 
@@ -59,6 +61,10 @@ void Viewer::renderHtml(QString html, QUrl baseUrl)
 
 void Viewer::save(QString path)
 {
+    if(path.isNull() || path.isEmpty()) {
+        return;
+    }
+
     qDebug() << "saving to: " << path;
     QPrinter pdfPrinter(QPrinter::HighResolution);
 
@@ -69,6 +75,24 @@ void Viewer::save(QString path)
 
     // TODO: fix frames
     webView->print(&pdfPrinter);
+}
+
+void Viewer::saveRenderTree(QString path)
+{
+    if(path.isNull() || path.isEmpty()) {
+        return;
+    }
+
+    QFile file(path);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      qDebug() << "Failed to open '"
+               << path
+               << "' in saveRenderTree().";
+
+    }
+
+    file.write(webView->page()->mainFrame()->renderTreeDump().toUtf8());
+    file.close();
 }
 
 } // namespace celerity

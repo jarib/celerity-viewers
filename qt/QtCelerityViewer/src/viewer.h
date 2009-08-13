@@ -31,6 +31,9 @@ namespace celerity {
         void renderHtml(QString, QUrl baseUrl = QUrl());
         void save(const QString path);
 
+    protected:
+        void saveRenderTree(QString path);
+
     };
 }
 
