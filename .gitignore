@@ -3,6 +3,7 @@
 qt/debug/
 qt/release/
 qt/QtCelerityViewer.app
+qt/QtCelerityViewer.xcodeproj/
 qt/qtc-gdbmacros/Makefile
 qt/qtc-gdbmacros/Makefile.Debug
 qt/qtc-gdbmacros/Makefile.Release
@@ -12,4 +13,6 @@ qt/Makefile.Release
 qt/QtCelerityViewer.pro.user
 qt/*.o
 qt/moc*
-qt/qjson/build
+qt/lib/qjson/build
+qt/lib/libqjson.a
+jruby-swt/classes
