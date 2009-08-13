@@ -1,8 +1,11 @@
+*QtCelerityViewer*
+================
+
 For now this only works on *nix.
 Please help if you have a Windows machine with dev tools available! :)
 
 Binaries
---------
+========
 
 If you don't want to compile the app yourself, binary downloads will be available on [GitHub](http://github.com/jarib/celerity-viewers/downloads).
 In addition, you need the Qt frameworks:
@@ -15,6 +18,20 @@ In addition, you need the Qt frameworks:
   * Mac OS X:
 
       Download and install the «Framework only» version from the [Qt Downloads page](http://qt.nokia.com/downloads)
+
+Configuration
+=============
+
+By default the server will start on _0.0.0.0:6429_.
+Set env vars to override:
+
+  * `QT_CELERTIY_VIEWER_HOST`
+  * `QT_CELERTIY_VIEWER_PORT`
+
+The WebKit inspector can be opened by right-clicking in the document and choosing «Inspect».
+
+Compiling
+=========
 
 Use Rake
 --------
@@ -30,7 +47,7 @@ on a Debian-based linux:
     `rake compile && ./QtCelerityViewer`
 
 
-Building manually
+Build manually
 -----------------
 
 Dependencies:
@@ -53,13 +70,3 @@ OS X:
     $ port install cmake
     $ qmake && make
 
-Configuration
--------------
-
-By default the server will start on _0.0.0.0:6429_.
-Set env vars to override:
-
-  * `QT_CELERTIY_VIEWER_HOST`
-  * `QT_CELERTIY_VIEWER_PORT`
-
-The WebKit inspector can be opened by right-clicking in the document and choosing «Inspect».
