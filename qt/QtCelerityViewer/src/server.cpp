@@ -11,8 +11,7 @@
 #include <QTcpSocket>
 #include "server.h"
 
-#define HOST "127.0.0.1"
-#define PORT 6429
+#define GETENV(var, def) (getenv(var) != 0 ? QString(getenv(var)) : QString(def))
 
 namespace celerity {
 
@@ -35,12 +34,15 @@ Server::~Server()
 
 void Server::run()
 {
+    QString host = GETENV("QT_CELERITY_VIEWER_HOST", "0.0.0.0");
+    int port = GETENV("QT_CELERITY_VIEWER_PORT", "6429").toInt();
+
     tcpServer = new QTcpServer();
-    tcpServer->listen(QHostAddress(HOST), PORT);
+    tcpServer->listen(QHostAddress(host), port);
 
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
 
-    qDebug() << "Server started on host: " << HOST << " port: " << PORT;
+    qDebug() << "Server started on host: " << host << " port: " << port;
 }
 
 void Server::stop()
