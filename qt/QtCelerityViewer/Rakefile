@@ -1,6 +1,6 @@
 require "rake"
 
-APPNAME     = "CelerityViewer"
+APP_NAME     = "QtCelerityViewer"
 APP_VERSION = `git rev-parse HEAD`[0,7].chomp
 
 module System
@@ -45,7 +45,7 @@ end
 
 abort("only works on *nix at the moment") if System.os == :windows
 
-desc 'Download/install Qt and cmake'
+desc 'download and install dependencies'
 task :deps do
   case System.platform
   when :macosx
@@ -67,21 +67,21 @@ task :deps do
   end
 end
 
-desc 'Compile QtCelerityViewer'
+desc 'compile'
 task :compile => :deps do
   sh "qmake && make"
 end
 
 case System.platform
 when :macosx
-  desc 'Install to /Applications'
+  desc 'install to /Applications'
   task :install => :compile do
     mv "./QtCelerityViewer.app", "/Applications", :verbose => true
   end
 
-  desc 'Buld QtCelerityViewer.dmg'
+  desc %Q{build #{APP_NAME}-#{APP_VERSION}.dmg}
   task :dmg => :compile do
-    name = "#{APPNAME}#{APP_VERSION}"
+    name = "#{APP_NAME}-#{APP_VERSION}"
   	mkdir "image", :verbose => true
   	cp_r "./QtCelerityViewer.app", "image", :verbose => true
 
@@ -89,22 +89,30 @@ when :macosx
   	sh %{hdiutil create -volname #{name} -srcfolder image #{name}.dmg}
 
   	rm_rf "image", :verbose => true
-  	mv "#{name}.dmg", "pkg"
   end
 
-  puts <<-TEXT
-
-    Run `rake install` to fetch dependencies, compile and install to /Applications
-
-  TEXT
-else
-  puts <<-TEXT
-
-    Run `rake compile` to download and compile
-
-  TEXT
+when :linux
+  desc "create #{APP_NAME}-#{APP_VERSION}.tgz"
+  task :package => :compile do
+    sh "tar zcf #{APP_NAME}-#{APP_VERSION}.tgz ./QtCelerityViewer"
+  end
 end
 
+task :default do
+  case System.platform
+  when :macosx
+    puts <<-TEXT
 
+      Run `rake install` to fetch dependencies, compile and install to /Applications
+
+    TEXT
+  when :linux
+    puts <<-TEXT
+
+      Run `rake compile` to install dependencies and compile
+
+    TEXT
+  end
+end
 
 
