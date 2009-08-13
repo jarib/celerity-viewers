@@ -16,9 +16,14 @@ HEADERS += src/mainwindow.h \
            src/server.h \
            lib/qjson/src/parser.h
 
-LIBS       += -Llib/
-mac:LIBS   += -lqjson-mac
-win32:LIBS += -lqjson-win32
-# :LIBS  += -lqjson-linux
-
 QMAKE_INFO_PLIST = Info.plist
+
+unix {
+    !exists(lib/libqjson.a) {
+        # help, what's the proper way to do build qjson as a static dependency?
+        system(mkdir lib/qjson/build && cd lib/qjson/build && cmake .. && make && ar rcs ../../libqjson.a src/CMakeFiles/qjson.dir/*.o && cd .. && rm -r build)
+    }
+    
+    LIBS       += -Llib/ -lqjson
+}
+

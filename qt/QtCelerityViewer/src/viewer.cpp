@@ -43,9 +43,11 @@ void Viewer::processJson(QByteArray json)
     QString meth = req["method"].toString();
     QString html = req["html"].toString();
 
+    qDebug() << "method: " << meth;
+
     if(meth == "page_changed" && html != lastHtml) {
         lastHtml = html;
-        qDebug() << "updating page: " << html.size();
+        qDebug() << "updating page, html is " << html.size() << " bytes";
         renderHtml(html, QUrl(req["url"].toString()) );
     } else if(meth == "save") {
         save( req["path"].toString() );
