@@ -4,7 +4,8 @@ require "rake/clean"
 APP_NAME     = "QtCelerityViewer"
 APP_VERSION = `git rev-parse HEAD`[0,7].chomp
 
-CLEAN.include("QtCelerityViewer.{app,xcodeproj}", "*.o", "moc_*.cpp")
+CLEAN.include("QtCelerityViewer.{app,xcodeproj}", "*.o")
+CLOBBER.include("moc_*.cpp")
 
 module System
   module_function
