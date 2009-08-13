@@ -79,6 +79,8 @@ task :compile => :deps do
   args         = case System.platform
                  when :macosx
                    ["-spec macx-g++", nil]
+                 else
+                   []
                  end
 
   sh "qmake #{args.first} && make #{args.last}"
