@@ -21,7 +21,8 @@ QMAKE_INFO_PLIST = Info.plist
 unix {
     !exists(lib/libqjson.a) {
         # help, what's the proper way to do build qjson as a static dependency?
-        system(mkdir lib/qjson/build && cd lib/qjson/build && cmake .. && make && ar rcs ../../libqjson.a src/CMakeFiles/qjson.dir/*.o && cd .. && rm -r build)
+        system(mkdir lib/qjson/build && cd lib/qjson/build && cmake .. && make && ar rcs ../../libqjson.a src/CMakeFiles/qjson.dir/*.o)
+        system(rm -r lib/qjson/build)
     }
     
     LIBS       += -Llib/ -lqjson
