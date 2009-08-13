@@ -1,2 +1,15 @@
 **/.DS_Store
 .DS_Store
+qt/QtCelerityViewer/debug/
+qt/QtCelerityViewer/release/
+qt/QtCelerityViewer/QtCelerityViewer.app
+qt/QtCelerityViewer/qtc-gdbmacros/Makefile
+qt/QtCelerityViewer/qtc-gdbmacros/Makefile.Debug
+qt/QtCelerityViewer/qtc-gdbmacros/Makefile.Release
+qt/QtCelerityViewer/Makefile
+qt/QtCelerityViewer/Makefile.Debug
+qt/QtCelerityViewer/Makefile.Release
+qt/QtCelerityViewer/QtCelerityViewer.pro.user
+qt/QtCelerityViewer/*.o
+qt/QtCelerityViewer/moc*
+qt/QtCelerityViewer/qjson/build
