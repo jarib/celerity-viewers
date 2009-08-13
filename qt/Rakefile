@@ -69,6 +69,8 @@ task :deps do
     unless `dpkg -L libqt4-dev`.include?("libQtWebKit.so")
       sh "sudo apt-get install cmake libqt4-dev"
     end
+
+    sh "sudo -k" # avoid running the rest as root
   else
     raise "unknown platform: #{System.platform.inspect}"
   end
