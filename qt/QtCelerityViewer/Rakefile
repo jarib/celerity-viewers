@@ -1,0 +1,94 @@
+require "rake"
+
+module System
+  module_function
+
+  def platform
+    @platform ||= case RUBY_PLATFORM
+    when /java/
+      :java
+    when /mswin|msys|mingw/
+      :windows
+    when /darwin/
+      :macosx
+    when /linux/
+      :linux
+    else
+      RUBY_PLATFORM
+    end
+  end
+
+  def os
+    return @os if @os
+    @os = platform()
+
+    if @os == :java
+      os_name = java.lang.System.getProperty("os.name")
+      @os = case os_name
+            when /windows/i
+              :windows
+            when /mac os/i
+              :macosx
+            when /linux/i
+              :linux
+            else
+              os_name
+            end
+    end
+
+    @os
+  end
+end
+
+abort("only works on *nix at the moment") if System.os == :windows
+
+desc 'Download/install Qt and cmake'
+task :deps do
+  case System.platform
+  when :macosx
+
+    if `port installed cmake` =~ /None of the specified ports are installed/
+      sh "sudo port install cmake"
+    end
+
+    unless File.directory?("/Library/Frameworks/QtWebKit.framework")
+      sh "curl -O http://get.qtsoftware.com/qt/source/qt-mac-opensource-4.5.2.dmg && open qt-mac-opensource-4.5.2.dmg"
+      abort("please complete the Qt framework installer")
+    end
+  when :linux
+    unless `dpkg -L libqt4-dev`.include?("libQtWebKit.so")
+      sh "sudo apt-get install cmake libqt4-dev"
+    end
+  else
+    raise "unknown platform: #{System.platform.inspect}"
+  end
+end
+
+desc 'Compile QtCelerityViewer'
+task :compile => :deps do
+  sh "qmake && make"
+end
+
+case System.platform
+when :macosx
+  desc 'Install to /Applications'
+  task :install => :compile do
+    mv "./QtCelerityViewer.app", "/Applications", :verbose => true
+  end
+
+  puts <<-TEXT
+
+    Run `rake install` to fetch dependencies, compile and install to /Applications
+
+  TEXT
+else
+  puts <<-TEXT
+
+    Run `rake compile` to download and compile
+
+  TEXT
+end
+
+
+
+

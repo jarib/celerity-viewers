@@ -35,7 +35,7 @@ Server::~Server()
 void Server::run()
 {
     QString host = GETENV("QT_CELERITY_VIEWER_HOST", "0.0.0.0");
-    int port = GETENV("QT_CELERITY_VIEWER_PORT", "6429").toInt();
+    int     port = GETENV("QT_CELERITY_VIEWER_PORT", "6429").toInt();
 
     tcpServer = new QTcpServer();
     tcpServer->listen(QHostAddress(host), port);
