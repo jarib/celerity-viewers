@@ -39,7 +39,7 @@ void MainWindow::createLocationEdit()
 {
     locationEdit = new QLineEdit(this);
     locationEdit->setSizePolicy(QSizePolicy::MinimumExpanding, locationEdit->sizePolicy().verticalPolicy());
-    locationEdit->setEnabled(false);
+    locationEdit->setReadOnly(true);
 
     QFont font = locationEdit->font();
     font.setPixelSize(11);
