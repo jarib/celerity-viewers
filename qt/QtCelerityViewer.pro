@@ -1,11 +1,10 @@
 # -------------------------------------------------
 # Project created by QtCreator 2009-08-11T03:43:25
 # -------------------------------------------------
-QT += network \
-    webkit # testlib
+QT += network webkit # testlib
 TARGET = QtCelerityViewer
 TEMPLATE = app
-RC_FILE = CelerityViewer.icns
+INCLUDEPATH += lib/qjson/src
 SOURCES += src/main.cpp \
     src/mainwindow.cpp \
     src/viewer.cpp \
@@ -16,13 +15,22 @@ HEADERS += src/mainwindow.h \
     lib/qjson/src/parser.h
 
 QMAKE_INFO_PLIST = Info.plist
+
+mac {
+    RC_FILE = CelerityViewer.icns
+}
+
 unix {
     !exists(lib/libqjson.a) {
-        # help, what's the proper way to do build qjson as a static dependency?
+        # this == ugly? suggestions welcome :)
         system(mkdir lib/qjson/build && cd lib/qjson/build && cmake .. && make && ar rcs ../../libqjson.a src/CMakeFiles/qjson.dir/*.o)
         system(rm -r lib/qjson/build)
     }
-    LIBS += -Llib/ \
-        -lqjson
 }
+
+win32 {
+    # need something to build qjson
+}
+
+LIBS += -Llib -lqjson
 

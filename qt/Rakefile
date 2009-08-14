@@ -5,7 +5,9 @@ APP_NAME     = "QtCelerityViewer"
 APP_VERSION = `git rev-parse HEAD`[0,7].chomp
 
 CLEAN.include   "QtCelerityViewer.{app,xcodeproj}",
-                "*.o"
+                "*.o",
+                "debug",
+                "release"
 
 CLOBBER.include "moc_*.cpp",
                 "Makefile*"
@@ -50,7 +52,7 @@ module System
   end
 end
 
-abort("only works on *nix at the moment") if System.os == :windows
+puts("only works on *nix at the moment") if System.os == :windows
 
 desc 'download and install dependencies'
 task :deps do

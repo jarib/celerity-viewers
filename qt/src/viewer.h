@@ -10,7 +10,7 @@
 #define VIEWER_H
 
 #include <QWebView>
-#include "lib/qjson/src/parser.h" // FIXME
+#include "parser.h"
 #include "server.h"
 
 namespace celerity {
