@@ -14,6 +14,8 @@
 #include <QPrinter>
 #include <QFile>
 
+#include <QApplication>
+#include <QDesktopWidget>
 
 namespace celerity {
 
@@ -75,18 +77,30 @@ void Viewer::save(QString path)
     webView->print(&pdfPrinter);
 }
 
+void Viewer::saveScreenshot(QString path)
+{
+//    QFile file(path);
+//    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+//      qDebug() << "Failed to open '" << path << "' in saveScreenshot().";
+//      return;
+//    }
+    if(path.isNull() || path.isEmpty())
+        return;
+
+    QPixmap pixmap = QPixmap::grabWindow(QApplication::desktop()->winId());
+    pixmap.save(path, "png");
+}
+
 void Viewer::saveRenderTree(QString path)
 {
-    if(path.isNull() || path.isEmpty()) {
+    if(path.isNull() || path.isEmpty())
         return;
-    }
+
 
     QFile file(path);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      qDebug() << "Failed to open '"
-               << path
-               << "' in saveRenderTree().";
-
+      qDebug() << "Failed to open '" << path << "' in saveRenderTree().";
+      return;
     }
 
     file.write(webView->page()->mainFrame()->renderTreeDump().toUtf8());

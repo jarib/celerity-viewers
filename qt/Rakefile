@@ -5,7 +5,9 @@ APP_NAME     = "QtCelerityViewer"
 APP_VERSION = `git rev-parse HEAD`[0,7].chomp
 
 CLEAN.include   "QtCelerityViewer.{app,xcodeproj}",
-                "*.o"
+                "*.o",
+                "debug",
+                "release"
 
 CLOBBER.include "moc_*.cpp",
                 "Makefile*"

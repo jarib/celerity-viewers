@@ -5,7 +5,7 @@ QT += network \
     webkit # testlib
 TARGET = QtCelerityViewer
 TEMPLATE = app
-RC_FILE = CelerityViewer.icns
+INCLUDEPATH += lib/qjson/src
 SOURCES += src/main.cpp \
     src/mainwindow.cpp \
     src/viewer.cpp \
@@ -16,13 +16,36 @@ HEADERS += src/mainwindow.h \
     lib/qjson/src/parser.h
 
 QMAKE_INFO_PLIST = Info.plist
+
+mac {
+    RC_FILE = CelerityViewer.icns
+}
+
+QJSON_FAILED=false
+# this is obviously the wrong way to do it
 unix {
     !exists(lib/libqjson.a) {
-        # help, what's the proper way to do build qjson as a static dependency?
-        system(mkdir lib/qjson/build && cd lib/qjson/build && cmake .. && make && ar rcs ../../libqjson.a src/CMakeFiles/qjson.dir/*.o)
+        system(mkdir lib/qjson/build)
+        system(cd lib/qjson/build && cmake .. && make && ar rcs ../../libqjson.a src/CMakeFiles/qjson.dir/*.o):QJSON_FAILED=TRUE
         system(rm -r lib/qjson/build)
     }
-    LIBS += -Llib/ \
-        -lqjson
 }
+
+win32 {
+    !exists(lib\libqjson.dll.a) {
+        system(mkdir lib\qjson\build)
+        system(cd lib\qjson\build && cmake -G "MinGW Makefiles" .. & mingw32-make.exe && ar rcs ..\..\libqjson.a src\CMakeFiles\qjson.dir\*.o):QJSON_FAILED=TRUE
+        system(rd /S lib\qjson\build)
+    }
+}
+    
+QJSON_FAILED { error("could not build qjson") }
+
+
+LIBS += -Llib -lqjson
+LIBS -= -mthreads
+
+# win32 {
+#     LIBS += -Llib -lqjson-win32
+# }
 

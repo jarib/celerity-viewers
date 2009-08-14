@@ -10,7 +10,7 @@
 #define VIEWER_H
 
 #include <QWebView>
-#include "lib/qjson/src/parser.h" // FIXME
+#include "parser.h"
 #include "server.h"
 
 namespace celerity {
@@ -35,6 +35,7 @@ namespace celerity {
         void processJson(QByteArray json);
         void renderHtml(QString, QUrl baseUrl = QUrl());
         void save(const QString path);
+        void saveScreenshot(const QString path);
 
     protected:
         void saveRenderTree(QString path);
