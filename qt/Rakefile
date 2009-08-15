@@ -52,7 +52,7 @@ module System
   end
 end
 
-abort("only works on *nix at the moment") if System.os == :windows
+puts("only works on *nix at the moment") if System.os == :windows
 
 desc 'download and install dependencies'
 task :deps do
@@ -94,8 +94,8 @@ case System.platform
 when :macosx
   desc 'install to /Applications'
   task :install => :compile do
-    file = "/Applications/QtCelerityViewer.app"
-    rm file if File.exist?(file)
+    app = "/Applications/QtCelerityViewer.app"
+    rm_r app if File.exist?(app)
     mv "./QtCelerityViewer.app", "/Applications", :verbose => true
   end
 

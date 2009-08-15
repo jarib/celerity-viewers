@@ -13,7 +13,7 @@ class MainController < NSObject
     setup_panel
     load_url
 
-    Thread.new { start_server } if have_json
+    Thread.new { start_server } if have_json?
   rescue
     log $!, $@
     raise $!
@@ -35,7 +35,7 @@ class MainController < NSObject
     @status_label.stringValue = "Updated: #{@update_count} times."
   end
 
-  def have_json
+  def have_json?
     require "json"
     true
   rescue LoadError => e
@@ -62,14 +62,8 @@ class MainController < NSObject
     alert.beginSheetModalForWindow_modalDelegate_didEndSelector_contextInfo(@window, self, nil, nil)
   end
 
-  def render_html(html, url = nil)
-    if url
-      uri = URI.parse(url)
-      base_url = "#{uri.scheme}://#{uri.host}"
-      @text_field.stringValue = url
-      url = NSURL.URLWithString(base_url)
-    end
-    @web_view.mainFrame.loadHTMLString_baseURL(html, url)
+  def render_html(html, url = '')
+    @web_view.mainFrame.loadHTMLString_baseURL(html, NSURL.URLWithString(url))
     bump_count
   rescue => e
     log(e)
