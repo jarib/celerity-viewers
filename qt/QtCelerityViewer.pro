@@ -16,9 +16,9 @@ HEADERS += src/mainwindow.h \
 
 QMAKE_INFO_PLIST = Info.plist
 
-mac {
-    RC_FILE = CelerityViewer.icns
-}
+# icons
+mac { RC_FILE = CelerityViewer-mac.icns }
+win32 { RC_FILE = icon-win32.rc }
 
 unix {
     !exists(lib/libqjson.a) {
