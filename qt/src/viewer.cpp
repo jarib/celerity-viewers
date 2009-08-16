@@ -33,6 +33,8 @@ Viewer::~Viewer()
 void Viewer::setWebView(QWebView* view)
 {
     webView = view;
+    webView->settings()->setAttribute(QWebSettings::PrintElementBackgrounds, true);
+    webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 }
 
 void Viewer::processJson(QByteArray json)
@@ -79,11 +81,6 @@ void Viewer::save(QString path)
 
 void Viewer::saveScreenshot(QString path)
 {
-//    QFile file(path);
-//    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-//      qDebug() << "Failed to open '" << path << "' in saveScreenshot().";
-//      return;
-//    }
     if(path.isNull() || path.isEmpty())
         return;
 

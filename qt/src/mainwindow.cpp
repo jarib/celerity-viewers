@@ -56,7 +56,6 @@ void MainWindow::createToolBar()
 
 void MainWindow::createWebView()
 {
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QString initialUrl = "http://celerity.rubyforge.org/";
 
 

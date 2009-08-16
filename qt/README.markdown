@@ -1,9 +1,6 @@
 *QtCelerityViewer*
 ================
 
-For now this only works on *nix.
-Please help if you have a Windows machine with dev tools available! :)
-
 Binaries
 ========
 
@@ -15,7 +12,7 @@ In addition, you need the Qt frameworks:
       `sudo apt-get install libqt4-webkit`
 
 
-  * Mac OS X:
+  * Mac OS X and Windows:
 
       Download and install the «Framework only» version from the [Qt Downloads page](http://qt.nokia.com/downloads)
 
