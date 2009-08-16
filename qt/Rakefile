@@ -10,7 +10,8 @@ CLEAN.include   "QtCelerityViewer.{app,xcodeproj}",
                 "release"
 
 CLOBBER.include "moc_*.cpp",
-                "Makefile*"
+                "Makefile*",
+                "*.{zip,tgz,dmg}"
 
 module System
   module_function
@@ -52,8 +53,6 @@ module System
   end
 end
 
-puts("only works on *nix at the moment") if System.os == :windows
-
 desc 'download and install dependencies'
 task :deps do
   case System.platform
@@ -73,8 +72,13 @@ task :deps do
     end
 
     sh "sudo -k" # avoid running the rest as root
+  when :windows
+    unless File.directory?(dir = "C:/Qt")
+      puts "Qt not found in #{dir.inspect}"
+      puts "please download and install Qt 4.5 from http://qt.nokia.com/downloads"
+    end
   else
-    raise "unknown platform: #{System.platform.inspect}"
+    raise "don't know how to get dependencies for: #{System.platform.inspect}"
   end
 end
 
@@ -87,7 +91,8 @@ task :compile => :deps do
                    []
                  end
 
-  sh "qmake #{args.first} && make #{args.last}"
+  sh "qmake #{args.first}"
+  sh "make #{args.last}"
 end
 
 case System.platform
@@ -126,6 +131,30 @@ when :linux
   task :run => :compile do
     sh "./QtCelerityViewer"
   end
+when :windows
+  desc "create #{APP_NAME}-#{APP_VERSION}.zip"
+  task :package => :compile do
+    zipfile = "#{APP_NAME}-#{APP_VERSION}.zip"
+    zipdir  = "QtCelerityViewer"
+
+    mkdir zipdir
+    begin
+
+      cp "release/QtCelerityViewer.exe", zipdir
+      cp "lib/libqjson.dll", zipdir
+
+      sh "7za a #{zipfile} #{zipdir}"
+    ensure
+      rm_r zipdir
+    end
+  end
+
+  desc 'compile and run'
+  task :run => :compile do
+    cp "lib/libqjson.dll", "release/libqjson.dll"
+    sh "start release/QtCelerityViewer.exe"
+  end
+
 end
 
 task :default do
