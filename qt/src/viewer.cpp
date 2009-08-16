@@ -33,7 +33,7 @@ Viewer::~Viewer()
 void Viewer::setWebView(QWebView* view)
 {
     webView = view;
-    webView->settings()->setAttribute(QWebSettings::PrintElementBackgrounds, true);
+    // webView->settings()->setAttribute(QWebSettings::PrintElementBackgrounds, true); /* only works on 4.5 */
     webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 }
 

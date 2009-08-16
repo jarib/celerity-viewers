@@ -87,6 +87,9 @@ task :compile => :deps do
   args         = case System.platform
                  when :macosx
                    ["-spec macx-g++", nil]
+                 when :windows
+                   rm_f "lib/libqjson.a" # remove non-dlls if they exist
+                   [nil, "release"]
                  else
                    []
                  end
@@ -136,12 +139,17 @@ when :windows
   task :package => :compile do
     zipfile = "#{APP_NAME}-#{APP_VERSION}.zip"
     zipdir  = "QtCelerityViewer"
+    qtdir   = ENV['QTDIR'] || raise("could not find QTDIR environment variable")
+    qtbin   = File.join(qtdir, "bin")
 
     mkdir zipdir
     begin
-
       cp "release/QtCelerityViewer.exe", zipdir
       cp "lib/libqjson.dll", zipdir
+      cp "#{qtbin}/QtCore4.dll", zipdir
+      cp "#{qtbin}/QtGui4.dll", zipdir
+      cp "#{qtbin}/QtNetwork4.dll", zipdir
+      cp "#{qtbin}/QtWebKit4.dll", zipdir
 
       sh "7za a #{zipfile} #{zipdir}"
     ensure
