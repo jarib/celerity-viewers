@@ -88,7 +88,6 @@ task :compile => :deps do
                  when :macosx
                    ["-spec macx-g++", nil]
                  when :windows
-                   rm_f "lib/libqjson.a" # remove non-dlls if they exist
                    [nil, "release"]
                  else
                    []
@@ -145,7 +144,8 @@ when :windows
     mkdir zipdir
     begin
       cp "release/QtCelerityViewer.exe", zipdir
-      cp "lib/libqjson.dll", zipdir
+      cp "lib/libqjson-win32.dll", zipdir
+      cp "#{qtbin}/mingwm10.dll", zipdir
       cp "#{qtbin}/QtCore4.dll", zipdir
       cp "#{qtbin}/QtGui4.dll", zipdir
       cp "#{qtbin}/QtNetwork4.dll", zipdir

@@ -27,13 +27,17 @@ unix {
         system(cd lib/qjson/build && cmake .. && make && ar rcs ../../libqjson.a src/CMakeFiles/qjson.dir/*.o)
         system(rm -r lib/qjson/build)
     }
+
+    LIBS += -Llib -lqjson
 }
 
 win32 {
-    !exists(lib/libqjson.dll) {
-        error("expected lib/libqjson.dll to already exist")
+    !exists(lib/libqjson-win32.dll) {
+        error("expected lib/libqjson-win32.dll to already exist")
     }
+
+    LIBS += -Llib -lqjson-win32
 }
 
-LIBS += -Llib -lqjson
+
 
