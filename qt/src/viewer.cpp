@@ -11,7 +11,7 @@
 #include <QWebSettings>
 #include <QWebFrame>
 #include <QVariantMap>
-#include <QPrinter>
+#include <QPainter>
 #include <QFile>
 
 #include <QApplication>
@@ -68,15 +68,21 @@ void Viewer::save(QString path)
     }
 
     qDebug() << "saving to: " << path;
-    QPrinter pdfPrinter(QPrinter::HighResolution);
+    QWebPage *page   = webView->page();
+    QWebFrame *frame = page->currentFrame();
+    QSize origSize   = page->viewportSize();
 
-    pdfPrinter.setFullPage(true);
-    pdfPrinter.setPaperSize(QPrinter::B0);
-    pdfPrinter.setOutputFileName(path);
-    pdfPrinter.setOutputFormat(QPrinter::PdfFormat);
+    page->setViewportSize(frame->contentsSize());
+    QImage image(page->viewportSize(), QImage::Format_ARGB32);
+    QPainter painter(&image);
+    frame->render(&painter);
+    page->setViewportSize(origSize);
+    painter.end();
 
-    // TODO: fix frames
-    webView->print(&pdfPrinter);
+    if(!path.endsWith(".png"))
+        path += ".png";
+
+    image.save(path);
 }
 
 void Viewer::saveScreenshot(QString path)
