@@ -4,7 +4,7 @@
 Binaries
 ========
 
-If you don't want to compile the app yourself, binary downloads will be available on [GitHub](http://github.com/jarib/celerity-viewers/downloads).
+If you don't want to compile the app yourself, binary downloads are available on [GitHub](http://github.com/jarib/celerity-viewers/downloads).
 In addition, you need the Qt frameworks:
 
   * Ubuntu/Debian:
@@ -12,9 +12,13 @@ In addition, you need the Qt frameworks:
       `sudo apt-get install libqt4-webkit`
 
 
-  * Mac OS X and Windows:
+  * Mac OS X:
 
       Download and install the «Framework only» version from the [Qt Downloads page](http://qt.nokia.com/downloads)
+
+  * Windows:
+
+      The Qt DLLs are included in the zip file, so no additional downloads are needed.
 
 Configuration
 =============

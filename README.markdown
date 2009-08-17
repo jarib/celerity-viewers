@@ -14,9 +14,9 @@ how
 
 The applications set up a TCP server on port 6429. Celerity will look for anyone listening on this port whenever an instance of the browser is created, and, if found, send HTML dumps whenever a page is changed using the protocol described on [this page][wiki-viewers] on the Celerity wiki.
 
-The RubyCocoa version has the WebKit inspector enabled - right-click and _Inspect Element_. The SWT version includes the [MouseOver DOM inspector][modi].
+The RubyCocoa and Qt apps has the WebKit inspector enabled - right-click and _Inspect Element_. The SWT version includes the [MouseOver DOM inspector][modi].
 
-Note: The pure Cocoa version in the repository is not working yet, you should use the RubyCocoa version for now.
+Note: The pure Cocoa version in the repository is not working yet, use Qt or RubyCocoa for now.
 
 future
 ======

@@ -144,7 +144,7 @@ when :windows
     mkdir zipdir
     begin
       cp "release/QtCelerityViewer.exe", zipdir
-      cp "lib/libqjson-win32.dll", zipdir
+      cp "lib/libqjson-win32.dll", "#{zipdir}/libqjson.dll"
       cp "#{qtbin}/mingwm10.dll", zipdir
       cp "#{qtbin}/QtCore4.dll", zipdir
       cp "#{qtbin}/QtGui4.dll", zipdir
