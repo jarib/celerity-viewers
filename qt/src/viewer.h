@@ -33,7 +33,7 @@ namespace celerity {
 
      public slots:
         void processJson(QByteArray json);
-        void renderHtml(QString, QUrl baseUrl = QUrl());
+        void renderHtml(QString, QString url = QString());
         void save(const QString path);
         void saveScreenshot(const QString path);
 

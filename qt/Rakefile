@@ -186,7 +186,7 @@ when :windows
 
   desc 'compile and run'
   task :run => :compile do
-    cp "lib/libqjson.dll", "release/libqjson.dll"
+    cp "lib/libqjson-win32.dll", "release/libqjson.dll"
     sh "start release/QtCelerityViewer.exe"
   end
 
@@ -222,3 +222,4 @@ task :test do
   c.goto "yahoo.com"
   RUBY
 end
+

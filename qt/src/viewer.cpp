@@ -47,7 +47,7 @@ void Viewer::processJson(QByteArray json)
     if(meth == "page_changed" && html != lastHtml) {
         lastHtml = html;
         qDebug() << "updating page, html is " << html.size() << " bytes";
-        renderHtml(html, QUrl(req["url"].toString()) );
+        renderHtml(html, req["url"].toString() );
     } else if(meth == "save") {
         save( req["path"].toString() );
     } else if(meth == "save_render_tree") {
@@ -55,10 +55,11 @@ void Viewer::processJson(QByteArray json)
     }
 }
 
-void Viewer::renderHtml(QString html, QUrl baseUrl)
+void Viewer::renderHtml(QString html, QString url)
 {
-    emit urlChanged(baseUrl.toString());
-    webView->setHtml(html, baseUrl);
+    emit urlChanged(url);
+    QUrl fullUrl(url);
+    webView->setHtml(html, QUrl(fullUrl.toString(QUrl::RemovePath)));
 }
 
 void Viewer::save(QString path)
