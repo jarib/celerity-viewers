@@ -3,7 +3,7 @@
 <plist version="0.9">
 <dict>
 	<key>CFBundleIconFile</key>
-	<string>CelerityViewer.icns</string>
+	<string>CelerityViewer-mac.icns</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
   <key>CFBundleGetInfoString</key>

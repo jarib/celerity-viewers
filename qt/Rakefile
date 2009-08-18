@@ -135,9 +135,9 @@ when :macosx
       end
 
     end
-    name = "#{APP_NAME}-#{APP_VERSION}"
+    name = "#{APP_NAME}-#{APP_VERSION}-osx"
     mkdir "image", :verbose => true
-    sh "cp -R ./#{APP_NAME}.app", "image", :verbose => true
+    sh "cp -R ./#{APP_NAME}.app image"
 
     puts 'Creating Image...'
     sh %{hdiutil create -volname #{name} -srcfolder image #{name}.dmg}
