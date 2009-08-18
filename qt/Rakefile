@@ -90,7 +90,7 @@ task :compile => :deps do
                  when :macosx
                    ["-spec macx-g++ -config release", nil]
                  when :windows
-                   [nil, "release"]
+                   ["-config release", "release"]
                  else
                    []
                  end
@@ -163,7 +163,7 @@ when :linux
 when :windows
   desc "create #{APP_NAME}-#{APP_VERSION}.zip"
   task :package => :compile do
-    zipfile = "#{APP_NAME}-#{APP_VERSION}.zip"
+    zipfile = "#{APP_NAME}-#{APP_VERSION}-windows.zip"
     zipdir  = "QtCelerityViewer"
     qtdir   = ENV['QTDIR'] || raise("could not find QTDIR environment variable")
     qtbin   = File.join(qtdir, "bin")
