@@ -41,7 +41,6 @@ void Server::run()
     tcpServer->listen(QHostAddress(host), port);
 
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
-
     qDebug() << "Server started on host: " << host << " port: " << port;
 }
 

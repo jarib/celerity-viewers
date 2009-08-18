@@ -1,8 +1,9 @@
 require "rake"
 require "rake/clean"
 
-APP_NAME     = "QtCelerityViewer"
+APP_NAME    = "QtCelerityViewer"
 APP_VERSION = `git rev-parse HEAD`[0,7].chomp
+FRAMEWORKS  = %w[QtCore QtGui QtNetwork QtWebKit]
 
 CLEAN.include   "QtCelerityViewer.{app,xcodeproj}",
                 "*.o",
@@ -86,7 +87,7 @@ desc 'compile'
 task :compile => :deps do
   args         = case System.platform
                  when :macosx
-                   ["-spec macx-g++", nil]
+                   ["-spec macx-g++ -config release", nil]
                  when :windows
                    [nil, "release"]
                  else
@@ -101,21 +102,46 @@ case System.platform
 when :macosx
   desc 'install to /Applications'
   task :install => :compile do
-    app = "/Applications/QtCelerityViewer.app"
+    app = "/Applications/#{APP_NAME}.app"
     rm_r app if File.exist?(app)
-    mv "./QtCelerityViewer.app", "/Applications", :verbose => true
+    mv "./#{APP_NAME}.app", "/Applications", :verbose => true
   end
 
   desc %Q{build #{APP_NAME}-#{APP_VERSION}.dmg}
   task :dmg => :compile do
+    if ENV['bundle_qt'] == 'true' # http://doc.trolltech.com/4.3/deployment-mac.html#frameworks
+      mkdir_p "#{APP_NAME}.app/Contents/Frameworks"
+
+      FRAMEWORKS.each do |framework|
+        # FileUtils.cp_r will use lowercase -r, missing symlinks on OS X
+        sh "cp -R /Library/Frameworks/#{framework}.framework #{APP_NAME}.app/Contents/Frameworks"
+        sh "install_name_tool -id @executable_path/../Frameworks/#{framework}.framework/Versions/4.0/#{framework} \
+            #{APP_NAME}.app/Contents/Frameworks/#{framework}.framework/Versions/4.0/#{framework}"
+        sh "install_name_tool -change /Library/Frameworks/#{framework}.framework/Versions/4.0/#{framework} \
+            @executable_path/../Frameworks/#{framework}.framework/Versions/4.0/#{framework} \
+            #{APP_NAME}.app/Contents/MacOS/#{APP_NAME}"
+      end
+
+
+      # link 'em up
+      FRAMEWORKS.each do |framework|
+        FRAMEWORKS.each do |other_framework|
+          next if framework == other_framework
+          sh "install_name_tool -change /Library/Frameworks/#{framework}.framework/Versions/4.0/#{framework} \
+                   @executable_path/../Frameworks/#{framework}.framework/Versions/4.0/#{framework} \
+                   #{APP_NAME}.app/Contents/Frameworks/#{other_framework}.framework/Versions/4.0/#{other_framework}"
+        end
+      end
+
+    end
     name = "#{APP_NAME}-#{APP_VERSION}"
-  	mkdir "image", :verbose => true
-  	cp_r "./QtCelerityViewer.app", "image", :verbose => true
+    mkdir "image", :verbose => true
+    sh "cp -R ./#{APP_NAME}.app", "image", :verbose => true
 
-  	puts 'Creating Image...'
-  	sh %{hdiutil create -volname #{name} -srcfolder image #{name}.dmg}
+    puts 'Creating Image...'
+    sh %{hdiutil create -volname #{name} -srcfolder image #{name}.dmg}
 
-  	rm_rf "image", :verbose => true
+    rm_rf "image", :verbose => true
   end
 
   desc 'compile and run'

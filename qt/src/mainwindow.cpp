@@ -17,17 +17,16 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     setWindowTitle("CelerityViewer");
-
     createLocationEdit();
     createWebView();
     createToolBar();
-
     setCentralWidget(view);
 }
 
 MainWindow::~MainWindow()
 {
-
+    delete locationEdit;
+    delete view;
 }
 
 void MainWindow::setLocation(QString location)
@@ -57,7 +56,6 @@ void MainWindow::createToolBar()
 void MainWindow::createWebView()
 {
     QString initialUrl = "http://celerity.rubyforge.org/";
-
 
     view = new QWebView(this);
     view->setHtml("<p style=\"font-size: 12px\">Loading QtCelerityViewer...</pre>");
