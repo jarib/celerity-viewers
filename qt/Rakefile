@@ -8,7 +8,8 @@ FRAMEWORKS  = %w[QtCore QtGui QtNetwork QtWebKit]
 CLEAN.include   "QtCelerityViewer.{app,xcodeproj}",
                 "*.o",
                 "debug",
-                "release"
+                "release",
+                "image"
 
 CLOBBER.include "moc_*.cpp",
                 "Makefile*",
