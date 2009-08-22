@@ -12,7 +12,8 @@ SOURCES += src/main.cpp \
 HEADERS += src/mainwindow.h \
     src/viewer.h \
     src/server.h \
-    lib/qjson/src/parser.h
+    lib/qjson/src/parser.h \
+    lib/qjson/src/serializer.h
 
 QMAKE_INFO_PLIST = Info.plist
 

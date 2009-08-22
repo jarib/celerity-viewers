@@ -58,7 +58,7 @@ void MainWindow::createWebView()
     QString initialUrl = "http://celerity.rubyforge.org/";
 
     view = new QWebView(this);
-    view->setHtml("<p style=\"font-size: 12px\">Loading QtCelerityViewer...</pre>");
+    view->setHtml("<p style=\"font-size: 12px\">Loading QtCelerityViewer...</p>");
     view->load(initialUrl);
     setLocation(initialUrl);
 }

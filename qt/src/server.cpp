@@ -7,7 +7,6 @@
 //
 
 
-#include <QVariantMap>
 #include <QTcpSocket>
 #include "server.h"
 
@@ -125,6 +124,14 @@ void Server::closeSocket()
         socket->close();
         disconnect(socket, 0, 0, 0);
     }
+}
+
+void Server::send(QVariantMap message)
+{
+    QByteArray jsonData = serializer.serialize(message);
+    QByteArray sent;
+    QTextStream(&sent) << "Content-Length: " << jsonData.length() << "\n\n" << jsonData;
+    socket->write(sent);
 }
 
 } // namespace celerity

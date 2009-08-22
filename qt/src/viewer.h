@@ -39,6 +39,9 @@ namespace celerity {
 
     protected:
         void saveRenderTree(QString path);
+        void renderPageTo(QImage *image);
+        void sendImageData();
+        void sendRenderTree();
 
     };
 }

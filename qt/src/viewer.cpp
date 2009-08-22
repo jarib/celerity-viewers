@@ -13,6 +13,7 @@
 #include <QVariantMap>
 #include <QPainter>
 #include <QFile>
+#include <QBuffer>
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -33,7 +34,6 @@ Viewer::~Viewer()
 void Viewer::setWebView(QWebView* view)
 {
     webView = view;
-    // webView->settings()->setAttribute(QWebSettings::PrintElementBackgrounds, true); /* only works on 4.5 */
     webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 }
 
@@ -48,11 +48,14 @@ void Viewer::processJson(QByteArray json)
         lastHtml = html;
         qDebug() << "updating page, html is " << html.size() << " bytes";
         renderHtml(html, req["url"].toString() );
-    } else if(meth == "save") {
-        save( req["path"].toString() );
-    } else if(meth == "save_render_tree") {
-        saveRenderTree( req["path"].toString() );
-    }
+    } else if(meth == "save")
+        save(req["path"].toString());
+      else if(meth == "image_data")
+        sendImageData();
+      else if(meth == "render_tree")
+        sendRenderTree();
+      else if(meth == "save_render_tree")
+        saveRenderTree(req["path"].toString());
 }
 
 void Viewer::renderHtml(QString html, QString url)
@@ -64,26 +67,37 @@ void Viewer::renderHtml(QString html, QString url)
 
 void Viewer::save(QString path)
 {
-    if(path.isNull() || path.isEmpty()) {
+    if(path.isNull() || path.isEmpty())
         return;
-    }
-
-    qDebug() << "saving to: " << path;
-    QWebPage *page   = webView->page();
-    QWebFrame *frame = page->currentFrame();
-    QSize origSize   = page->viewportSize();
-
-    page->setViewportSize(frame->contentsSize());
-    QImage image(page->viewportSize(), QImage::Format_ARGB32);
-    QPainter painter(&image);
-    frame->render(&painter);
-    page->setViewportSize(origSize);
-    painter.end();
 
     if(!path.endsWith(".png"))
         path += ".png";
 
+    qDebug() << "saving to: " << path;
+
+    QImage image(webView->page()->currentFrame()->contentsSize(), QImage::Format_ARGB32);
+    renderPageTo(&image);
     image.save(path);
+}
+
+void Viewer::sendImageData()
+{
+    QImage image(webView->page()->currentFrame()->contentsSize(), QImage::Format_ARGB32);
+    renderPageTo(&image);
+
+    QByteArray data;
+    QBuffer buffer(&data);
+    buffer.open(QBuffer::WriteOnly);
+
+    QVariantMap message;
+
+    if(!image.save(&buffer, "PNG"))
+        message.insert("error", "could not save image data to buffer");
+    else {
+        message.insert("image", QString(data.toBase64()));
+    }
+
+    server.send(message);
 }
 
 void Viewer::saveScreenshot(QString path)
@@ -93,6 +107,21 @@ void Viewer::saveScreenshot(QString path)
 
     QPixmap pixmap = QPixmap::grabWindow(QApplication::desktop()->winId());
     pixmap.save(path, "png");
+}
+
+void Viewer::renderPageTo(QImage* image)
+{
+    QWebPage *page   = webView->page();
+    QWebFrame *frame = page->currentFrame();
+    QSize origSize   = page->viewportSize();
+
+    page->setViewportSize(frame->contentsSize());
+
+    QPainter painter(image);
+    frame->render(&painter);
+
+    painter.end();
+    page->setViewportSize(origSize);
 }
 
 void Viewer::saveRenderTree(QString path)
@@ -110,6 +139,14 @@ void Viewer::saveRenderTree(QString path)
     file.write(webView->page()->mainFrame()->renderTreeDump().toUtf8());
     file.close();
 }
+
+void Viewer::sendRenderTree()
+{
+    QVariantMap message;
+    message.insert("render_tree", webView->page()->mainFrame()->renderTreeDump());
+    server.send(message);
+}
+
 
 } // namespace celerity
 
