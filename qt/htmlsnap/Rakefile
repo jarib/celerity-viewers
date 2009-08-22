@@ -1,0 +1,12 @@
+
+
+task :compile do
+  case RUBY_PLATFORM
+  when /linux/
+    sh "qmake && make"
+  when /darwin/
+    sh "qmake -spec macx-g++ && make"
+  else
+    $stderr.puts "unknown platform"
+  end
+end

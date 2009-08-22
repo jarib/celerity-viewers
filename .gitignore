@@ -3,6 +3,7 @@
 qt/debug/
 qt/release/
 qt/QtCelerityViewer.app
+qt/htmlsnap/htmlsnap
 qt/QtCelerityViewer.xcodeproj/
 qt/qtc-gdbmacros/Makefile
 qt/qtc-gdbmacros/Makefile.Debug

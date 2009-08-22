@@ -1,0 +1,4 @@
+The htmlsnap program speaks the same protocol as the celerity viewers, however
+it only responds to a msg of {"html" => "some string"}, and will then write a
+Base64-encoded PNG image to the socket for the client to read. This can either
+be used directly or wrapped in a web service (see http.rb for a Sinatra version).
