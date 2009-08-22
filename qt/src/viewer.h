@@ -10,7 +10,7 @@
 #define VIEWER_H
 
 #include <QWebView>
-#include "parser.h"
+#include <QVariantMap>
 #include "server.h"
 
 namespace celerity {
@@ -19,7 +19,6 @@ namespace celerity {
 
         QWebView* webView;
         Server server;
-        QJson::Parser parser;
         QString lastHtml;
 
     public:
@@ -32,7 +31,7 @@ namespace celerity {
         void urlChanged(QString newUrl);
 
      public slots:
-        void processJson(QByteArray json);
+        void processMessage(QVariantMap req);
         void renderHtml(QString, QString url = QString());
         void save(const QString path);
         void saveScreenshot(const QString path);

@@ -17,6 +17,7 @@
 #include <QVariantMap>
 
 #include "serializer.h"
+#include "parser.h"
 
 namespace celerity {
     class Server : public QObject {
@@ -28,7 +29,9 @@ namespace celerity {
         QMutex mutex;
         QByteArray jsonString;
         int length, bytesRead;
+
         QJson::Serializer serializer;
+        QJson::Parser parser;
 
     public:
         Server(QObject* parent = 0);
@@ -38,7 +41,7 @@ namespace celerity {
         void send(QVariantMap data);
 
     signals:
-        void jsonReceived(QByteArray jsonString);
+        void messageReceived(QVariantMap message);
 
     public slots:
         void acceptConnection();

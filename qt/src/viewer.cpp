@@ -10,7 +10,6 @@
 #include "viewer.h"
 #include <QWebSettings>
 #include <QWebFrame>
-#include <QVariantMap>
 #include <QPainter>
 #include <QFile>
 #include <QBuffer>
@@ -22,7 +21,7 @@ namespace celerity {
 
 Viewer::Viewer()
 {
-    connect(&server, SIGNAL(jsonReceived(QByteArray)), this, SLOT(processJson(QByteArray)));
+    connect(&server, SIGNAL(messageReceived(QVariantMap)), this, SLOT(processMessage(QVariantMap)));
     server.run();
 }
 
@@ -37,10 +36,8 @@ void Viewer::setWebView(QWebView* view)
     webView->settings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 }
 
-void Viewer::processJson(QByteArray json)
+void Viewer::processMessage(QVariantMap req)
 {
-    QVariantMap req = parser.parse(json).toMap();
-
     QString meth = req["method"].toString();
     QString html = req["html"].toString();
 

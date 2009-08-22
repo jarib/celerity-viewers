@@ -11,6 +11,7 @@
 #include "server.h"
 
 #define GETENV(var, def) (getenv(var) != 0 ? QString(getenv(var)) : QString(def))
+#define HEADER_LENGTH 16
 
 namespace celerity {
 
@@ -21,13 +22,13 @@ Server::Server(QObject *parent)
     , length(0)
     , bytesRead(0)
 {
-    qDebug() << "creating Server";
+    qDebug() << "creating celerity::Server";
     return;
 }
 
 Server::~Server()
 {
-    qDebug() << "destroying Server";
+    qDebug() << "destroying celerity::Server";
     delete tcpServer;
 }
 
@@ -40,7 +41,7 @@ void Server::run()
     tcpServer->listen(QHostAddress(host), port);
 
     connect(tcpServer, SIGNAL(newConnection()), this, SLOT(acceptConnection()));
-    qDebug() << "Server started on host: " << host << " port: " << port;
+    qDebug() << "celerity::Server started on host: " << host << " port: " << port;
 }
 
 void Server::stop()
@@ -60,9 +61,7 @@ void Server::acceptConnection()
         delete socket;
     }
 
-    socket = tcpServer->nextPendingConnection();
-
-    if(!socket)
+    if(!(socket = tcpServer->nextPendingConnection()))
         return;
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readSocket()));
@@ -74,22 +73,22 @@ void Server::readSocket()
 {
     int available = socket->bytesAvailable();
     while(available > 0) {
-         QByteArray buf = socket->read(16);
+         QByteArray buf = socket->read(HEADER_LENGTH);
          if(buf == "Content-Length: ") {
              length = readNextMessageLength();
              jsonString.clear();
              bytesRead = 0;
          } else {
              jsonString.append(buf);
-             jsonString.append(socket->read(available));
+             jsonString.append(socket->read(available - HEADER_LENGTH));
              bytesRead += available;
          }
 
          if(bytesRead == length) {
-             emit jsonReceived(jsonString);
+             emit messageReceived(parser.parse(jsonString).toMap());
              jsonString.clear();
              bytesRead = 0;
-             length = 0;
+             length    = 0;
          }
 
          available = socket->bytesAvailable();
