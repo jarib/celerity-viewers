@@ -1,5 +1,5 @@
 
-
+desc 'Compile htmlsnap'
 task :compile do
   case RUBY_PLATFORM
   when /linux/

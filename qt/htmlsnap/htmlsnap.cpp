@@ -9,6 +9,8 @@
 
 HtmlSnap::HtmlSnap()
 {
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, false);
+
     connect(&page, SIGNAL(loadFinished(bool)), this, SLOT(render()));
     connect(&server, SIGNAL(messageReceived(QVariantMap)), this, SLOT(processMessage(QVariantMap)));
     server.run();
