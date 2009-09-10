@@ -34,6 +34,8 @@ void HtmlSnap::processMessage(QVariantMap message)
         if(widthOk && heightOk){
             userSize.setHeight(height);
             userSize.setWidth(width);
+        } else {
+            qDebug() << "invalid parameters! :width => " << message["width"] << ", :height => " << message["height"];
         }
     }
 
