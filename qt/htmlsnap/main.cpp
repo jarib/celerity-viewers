@@ -8,10 +8,20 @@
 #include <QApplication>
 #include "htmlsnap.h"
 
-
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    HtmlSnap snap;
+
+    bool jsEnabled;
+
+    QStringList args = app.arguments();
+    if(args.size() > 1 && args.at(1) == "--disable-javascript")
+        jsEnabled = false;
+    else
+        jsEnabled = true;
+
+    qDebug() << "javascript enabled: " << jsEnabled;
+
+    HtmlSnap snap(jsEnabled);
     return app.exec();
 }

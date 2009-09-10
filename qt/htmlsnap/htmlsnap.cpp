@@ -7,10 +7,9 @@
 #include <QBuffer>
 #include <QVariantMap>
 
-HtmlSnap::HtmlSnap()
+HtmlSnap::HtmlSnap(bool javascriptEnabled)
 {
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, false);
-
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, javascriptEnabled);
     connect(&page, SIGNAL(loadFinished(bool)), this, SLOT(render()));
     connect(&server, SIGNAL(messageReceived(QVariantMap)), this, SLOT(processMessage(QVariantMap)));
     server.run();

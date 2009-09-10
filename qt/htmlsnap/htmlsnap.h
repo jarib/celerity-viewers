@@ -13,7 +13,7 @@ class HtmlSnap : public QObject
     QWebPage page;
     celerity::Server server;
 public:
-    HtmlSnap();
+    HtmlSnap(bool javascriptEnabled);
     void loadHtml(QString html);
 
 private slots:
