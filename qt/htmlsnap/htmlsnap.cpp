@@ -24,6 +24,9 @@ void HtmlSnap::loadHtml(QString html)
 
 void HtmlSnap::processMessage(QVariantMap message)
 {
+    userSize.setHeight(0);
+    userSize.setWidth(0);
+
     if(message.contains("width") && message.contains("height")) {
         int width, height;
         bool widthOk, heightOk;
@@ -35,12 +38,11 @@ void HtmlSnap::processMessage(QVariantMap message)
             userSize.setHeight(height);
             userSize.setWidth(width);
         } else {
-            qDebug() << "invalid parameters! :width => " << message["width"] << ", :height => " << message["height"];
+          qDebug() << "invalid parameters! :width => " << message["width"] << ", :height => " << message["height"];
         }
     } else {
         qDebug() << "no size specified, using content size";
     }
-
 
     loadHtml(message["html"].toString());
 }
@@ -49,18 +51,13 @@ void HtmlSnap::render()
 {
     QSize contentsSize = page.mainFrame()->contentsSize();
 
-    if(userSize.isEmpty()) {
-        page.setViewportSize(contentsSize);
-    } else {
+    if(userSize.width() == 0)
+      userSize.setWidth(contentsSize.width());
+    
+    if(userSize.height() == 0)
+      userSize.setHeight(contentsSize.height());
 
-        if(userSize.width() == 0)
-            userSize.setWidth(contentsSize.width());
-
-        if(userSize.height() == 0)
-            userSize.setHeight(contentsSize.height());
-
-        page.setViewportSize(userSize);
-    }
+    page.setViewportSize(userSize);
 
     QImage image(page.viewportSize(), QImage::Format_ARGB32);
     QPainter painter(&image);
@@ -80,9 +77,6 @@ void HtmlSnap::render()
         message.insert("image", QString(data.toBase64()));
         server.send(message);
     }
-
-    userSize.setHeight(0);
-    userSize.setWidth(0);
 
     emit finished();
 }
