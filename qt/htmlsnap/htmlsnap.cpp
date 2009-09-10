@@ -47,9 +47,18 @@ void HtmlSnap::processMessage(QVariantMap message)
 
 void HtmlSnap::render()
 {
+    QSize contentsSize = page.mainFrame()->contentsSize();
+
     if(userSize.isEmpty()) {
-        page.setViewportSize(page.mainFrame()->contentsSize());
+        page.setViewportSize(contentsSize);
     } else {
+
+        if(userSize.width() == 0)
+            userSize.setWidth(contentsSize.width());
+
+        if(userSize.height() == 0)
+            userSize.setHeight(contentsSize.height());
+
         page.setViewportSize(userSize);
     }
 
