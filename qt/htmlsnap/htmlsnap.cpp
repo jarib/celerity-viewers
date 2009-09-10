@@ -7,11 +7,15 @@
 #include <QBuffer>
 #include <QVariantMap>
 
-HtmlSnap::HtmlSnap(bool javascriptEnabled)
+HtmlSnap::HtmlSnap(bool javascriptEnabled) : initialSize(page.viewportSize())
 {
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, javascriptEnabled);
+
+    initialSize = page.viewportSize();
+
     connect(&page, SIGNAL(loadFinished(bool)), this, SLOT(render()));
     connect(&server, SIGNAL(messageReceived(QVariantMap)), this, SLOT(processMessage(QVariantMap)));
+
     server.run();
 }
 
@@ -47,6 +51,8 @@ void HtmlSnap::render()
         message.insert("image", QString(data.toBase64()));
         server.send(message);
     }
+
+    page.setViewportSize(initialSize);
 
     emit finished();
 }

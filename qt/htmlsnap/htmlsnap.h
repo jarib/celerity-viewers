@@ -11,6 +11,7 @@ class HtmlSnap : public QObject
     Q_OBJECT
 
     QWebPage page;
+    QSize initialSize;
     celerity::Server server;
 public:
     HtmlSnap(bool javascriptEnabled);
