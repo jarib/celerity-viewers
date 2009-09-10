@@ -37,7 +37,10 @@ void HtmlSnap::processMessage(QVariantMap message)
         } else {
             qDebug() << "invalid parameters! :width => " << message["width"] << ", :height => " << message["height"];
         }
+    } else {
+        qDebug() << "no size specified, using content size";
     }
+
 
     loadHtml(message["html"].toString());
 }
