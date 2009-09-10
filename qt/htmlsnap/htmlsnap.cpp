@@ -7,11 +7,9 @@
 #include <QBuffer>
 #include <QVariantMap>
 
-HtmlSnap::HtmlSnap(bool javascriptEnabled) : initialSize(page.viewportSize())
+HtmlSnap::HtmlSnap(bool javascriptEnabled)
 {
     QWebSettings::globalSettings()->setAttribute(QWebSettings::JavascriptEnabled, javascriptEnabled);
-
-    initialSize = page.viewportSize();
 
     connect(&page, SIGNAL(loadFinished(bool)), this, SLOT(render()));
     connect(&server, SIGNAL(messageReceived(QVariantMap)), this, SLOT(processMessage(QVariantMap)));
@@ -26,13 +24,30 @@ void HtmlSnap::loadHtml(QString html)
 
 void HtmlSnap::processMessage(QVariantMap message)
 {
+    if(message.contains("width") && message.contains("height")) {
+        int width, height;
+        bool widthOk, heightOk;
+
+        width  = message["width"].toInt(&widthOk);
+        height = message["height"].toInt(&heightOk);
+
+        if(widthOk && heightOk){
+            userSize.setHeight(height);
+            userSize.setWidth(width);
+        }
+    }
+
     loadHtml(message["html"].toString());
 }
 
-
 void HtmlSnap::render()
 {
-    page.setViewportSize(page.mainFrame()->contentsSize());
+    if(userSize.isEmpty()) {
+        page.setViewportSize(page.mainFrame()->contentsSize());
+    } else {
+        page.setViewportSize(userSize);
+    }
+
     QImage image(page.viewportSize(), QImage::Format_ARGB32);
     QPainter painter(&image);
 
@@ -52,7 +67,8 @@ void HtmlSnap::render()
         server.send(message);
     }
 
-    page.setViewportSize(initialSize);
+    userSize.setHeight(0);
+    userSize.setWidth(0);
 
     emit finished();
 }
